@@ -1,0 +1,12 @@
+.DS_Store
+.build/
+DerivedData/
+build/
+screenshots/
+
+# Xcode-Nutzerdaten sind mac-spezifisch und gehoeren nicht ins Repo.
+*.xcuserstate
+xcuserdata/
+
+# Lokale Build-Variablen mit Team-ID o. Ae. — nie einchecken (Repo kann public werden).
+.env
