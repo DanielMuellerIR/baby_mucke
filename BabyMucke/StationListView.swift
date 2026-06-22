@@ -11,6 +11,14 @@ struct StationListView: View {
     @State private var editingDraft: StationDraft?
     @State private var alertMessage: String?
 
+    // Eingefrorene Anzeige-Reihenfolge der Hauptliste (Sender-IDs).
+    // Wird einmal beim Erscheinen und bei echten Listenaenderungen aus
+    // `stationsForPlaybackList` uebernommen. So steht beim App-Start weiterhin
+    // "Favorit + zuletzt gespielt" oben, die Liste springt aber NICHT mehr um,
+    // wenn man waehrend der Session einen Sender antippt (das aendert nur
+    // "zuletzt gespielt", nicht die Senderliste selbst).
+    @State private var displayedOrder: [UUID] = []
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
@@ -37,6 +45,12 @@ struct StationListView: View {
             }
         }
         .background(BlackMidiStyle.panelFill)
+        .onAppear(perform: freezeOrderIfNeeded)
+        .onChange(of: stationStore.stations) { _, _ in
+            // Echte Listenaenderung (Anlegen/Bearbeiten/Importieren/Loeschen)
+            // -> Reihenfolge neu einfrieren, damit neue Sender erscheinen.
+            freezeOrder()
+        }
         .fileImporter(isPresented: $showingImporter, allowedContentTypes: [.json]) { result in
             handleImport(result)
         }
@@ -65,7 +79,30 @@ struct StationListView: View {
     }
 
     private var stationsForDisplay: [Station] {
-        editMode ? stationStore.stations : stationStore.stationsForPlaybackList
+        editMode ? stationStore.stations : orderedPlaybackStations
+    }
+
+    // Hauptliste in der eingefrorenen Reihenfolge. Sender, die seit dem letzten
+    // Einfrieren noch nicht enthalten sind, werden hinten angehaengt (Fallback,
+    // falls `displayedOrder` noch leer ist oder ein Sender neu hinzukam).
+    private var orderedPlaybackStations: [Station] {
+        let byID = Dictionary(stationStore.enabledStations.map { ($0.id, $0) },
+                              uniquingKeysWith: { first, _ in first })
+        var ordered = displayedOrder.compactMap { byID[$0] }
+        let known = Set(displayedOrder)
+        for station in stationStore.enabledStations where !known.contains(station.id) {
+            ordered.append(station)
+        }
+        return ordered
+    }
+
+    private func freezeOrderIfNeeded() {
+        guard displayedOrder.isEmpty else { return }
+        freezeOrder()
+    }
+
+    private func freezeOrder() {
+        displayedOrder = stationStore.stationsForPlaybackList.map(\.id)
     }
 
     private var alertIsPresented: Binding<Bool> {
