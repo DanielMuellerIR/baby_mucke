@@ -19,8 +19,11 @@ enum PlaylistResolver {
     static func needsResolution(_ url: URL) -> Bool {
         let s = url.absoluteString.lowercased()
         if s.contains(".m3u8") { return false }
+        // "-pls" faengt TuneIn-Endpunkte wie ".../tunein-aac-hd-pls" ab, die eine
+        // PLS-Playlist liefern, aber weder auf ".pls" noch "/pls" enden.
         return s.contains(".pls") || s.contains(".m3u") || s.contains(".asx")
             || s.contains(".xspf") || s.contains("tune.ashx") || s.contains("/pls")
+            || s.contains("-pls")
     }
 
     // Nur den Kopf der Datei laden: Falls die Heuristik irrt und die URL schon
@@ -53,8 +56,9 @@ enum PlaylistResolver {
             if l.isEmpty || l.hasPrefix("#") || l.hasPrefix("[") { continue }
             if l.lowercased().hasPrefix("http"), let u = URL(string: l) { return u }
         }
-        // ASX/XSPF: <location>URL</location> oder href="URL".
-        if let m = firstMatch(text, pattern: "(?:<location>|href=\")\\s*(https?://[^<\"\\s]+)") {
+        // ASX/XSPF: <location>URL</location> oder href="URL" / href='URL'
+        // (XML erlaubt beide Anfuehrungszeichen; manche ASX-Dateien nutzen ').
+        if let m = firstMatch(text, pattern: "(?:<location>|href=[\"'])\\s*(https?://[^<\"'\\s]+)") {
             return URL(string: m)
         }
         return nil
