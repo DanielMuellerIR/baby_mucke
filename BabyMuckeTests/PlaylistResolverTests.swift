@@ -27,6 +27,8 @@ final class PlaylistResolverTests: XCTestCase {
         XCTAssertFalse(PlaylistResolver.needsResolution(URL(string: "https://x/stream.aac")!))
         // .m3u8 ist HLS und wird absichtlich NICHT als Playlist-Container behandelt.
         XCTAssertFalse(PlaylistResolver.needsResolution(URL(string: "https://x/master.m3u8")!))
+        // "-pls" mitten im Host (nicht an einer Pfad-Grenze) ist KEINE Playlist.
+        XCTAssertFalse(PlaylistResolver.needsResolution(URL(string: "https://my-pls-cdn.example/stream.mp3")!))
     }
 
     // MARK: - firstMediaURL

@@ -58,5 +58,8 @@ struct SeedStation: Decodable {
 // driften kann. Einziger Konsument ist der HTTP-User-Agent in PlaylistResolver
 // und ICYMetadataReader.
 enum AppInfo {
-    static let version = (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? "0.1.11"
+    // Fallback bewusst versions-agnostisch ("dev"): er greift nur, wenn der
+    // Bundle-Key fehlt (z.B. im Unit-Test), und landet allein im User-Agent —
+    // ein Versionsliteral hier wuerde genau die Drift wieder einfuehren.
+    static let version = (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? "dev"
 }
