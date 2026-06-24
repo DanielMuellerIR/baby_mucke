@@ -1,13 +1,15 @@
 # Baby, Mucke! — Projektplan
 
-Stand: 2026-06-17
+Stand: 2026-06-25
 
 ## Aktueller Status
 
 - Git-Repo unter `~/git/baby_mucke` ist initialisiert, Branch `main`.
-- Aktuelle App-Version: **0.1.10**.
+- Aktuelle App-Version: **0.1.11**.
 - iOS-Projekt `BabyMucke.xcodeproj` existiert und baut fuer den iOS-Simulator.
 - Build-Befehl: `./scripts/build-simulator.sh`.
+- Unit-Test-Target `BabyMuckeTests` (31 Tests fuer die reine Logik) vorhanden;
+  Lauf: `./scripts/run-tests.sh` (waehlt Simulator automatisch).
 - Audio-Engine fuer den MVP: **AVPlayer zuerst**.
 - Portiert/angelegt: Sender-Modelle, Sender-Store, Playlist-Aufloesung, ICY-Metadatenleser,
   Verlauf, Apple-Music-/Spotify-Suchlinks, Black-MIDI-SwiftUI-Oberflaeche, Background-Audio-
