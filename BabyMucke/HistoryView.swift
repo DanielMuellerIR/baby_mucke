@@ -167,7 +167,10 @@ struct HistoryView: View {
         if animated {
             withAnimation { proxy.scrollTo(newestID, anchor: .bottom) }
         } else {
-            proxy.scrollTo(newestID, anchor: .bottom)
+            // Beim ersten Erscheinen sind die LazyVStack-Zeilen evtl. noch nicht
+            // angelegt; ein sofortiges scrollTo verpufft dann. Einen Runloop spaeter
+            // existieren die Zeilen und der Sprung ans Ende greift zuverlaessig.
+            DispatchQueue.main.async { proxy.scrollTo(newestID, anchor: .bottom) }
         }
     }
 
