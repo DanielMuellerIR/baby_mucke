@@ -198,7 +198,7 @@ enum StationImportError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .emptyOrInvalid:
-            return "Keine gueltigen Sender gefunden."
+            return String(localized: "Keine gültigen Sender gefunden.")
         }
     }
 }

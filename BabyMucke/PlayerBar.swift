@@ -8,7 +8,7 @@ struct PlayerBar: View {
         HStack(spacing: 12) {
             Button(action: primaryAction) {
                 Image(systemName: radioPlayer.isPlaying || radioPlayer.isLoading ? "stop.fill" : "play.fill")
-                    .accessibilityLabel(radioPlayer.isPlaying || radioPlayer.isLoading ? "Stop" : "Play")
+                    .accessibilityLabel(radioPlayer.isPlaying || radioPlayer.isLoading ? Text("Wiedergabe stoppen") : Text("Wiedergabe starten"))
             }
             .buttonStyle(PlaybackButtonStyle(
                 tint: radioPlayer.isPlaying ? BlackMidiStyle.green : BlackMidiStyle.cyan,

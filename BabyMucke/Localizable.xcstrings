@@ -66,6 +66,11 @@
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Stopped" } }
       }
     },
+    "Keine gültigen Sender gefunden." : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "No valid stations found." } }
+      }
+    },
     "Keine Sender" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "No stations" } }
@@ -169,6 +174,16 @@
     "Wiedergabe" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Playing" } }
+      }
+    },
+    "Wiedergabe starten" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Play" } }
+      }
+    },
+    "Wiedergabe stoppen" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Stop" } }
       }
     }
   },
