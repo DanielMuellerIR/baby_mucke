@@ -34,8 +34,10 @@ final class SongHistory: ObservableObject {
     private let shortImmediate: TimeInterval = 5
     private let shortLaunchQuit: TimeInterval = 20
 
-    init() {
-        let dir = FileManager.default
+    // `directory` ist standardmaessig der App-Support-Ordner und wird nur fuer
+    // Tests injiziert, damit diese nicht auf der gemeinsamen verlauf.json arbeiten.
+    init(directory: URL? = nil) {
+        let dir = directory ?? FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("BabyMucke", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

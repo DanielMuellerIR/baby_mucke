@@ -29,6 +29,8 @@
 		A00000000000000000000033 /* PlaylistResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000033 /* PlaylistResolverTests.swift */; };
 		A00000000000000000000034 /* ColorHexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000034 /* ColorHexTests.swift */; };
 		A00000000000000000000035 /* StationDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000035 /* StationDecodingTests.swift */; };
+		A00000000000000000000036 /* SongHistoryPruningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000036 /* SongHistoryPruningTests.swift */; };
+		A00000000000000000000037 /* StationStoreLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000037 /* StationStoreLogicTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,6 +59,8 @@
 		B00000000000000000000033 /* PlaylistResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistResolverTests.swift; sourceTree = "<group>"; };
 		B00000000000000000000034 /* ColorHexTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHexTests.swift; sourceTree = "<group>"; };
 		B00000000000000000000035 /* StationDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationDecodingTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000036 /* SongHistoryPruningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongHistoryPruningTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000037 /* StationStoreLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationStoreLogicTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -129,6 +133,8 @@
 				B00000000000000000000033 /* PlaylistResolverTests.swift */,
 				B00000000000000000000034 /* ColorHexTests.swift */,
 				B00000000000000000000035 /* StationDecodingTests.swift */,
+				B00000000000000000000036 /* SongHistoryPruningTests.swift */,
+				B00000000000000000000037 /* StationStoreLogicTests.swift */,
 			);
 			path = BabyMuckeTests;
 			sourceTree = "<group>";
@@ -252,6 +258,8 @@
 				A00000000000000000000033 /* PlaylistResolverTests.swift in Sources */,
 				A00000000000000000000034 /* ColorHexTests.swift in Sources */,
 				A00000000000000000000035 /* StationDecodingTests.swift in Sources */,
+				A00000000000000000000036 /* SongHistoryPruningTests.swift in Sources */,
+				A00000000000000000000037 /* StationStoreLogicTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

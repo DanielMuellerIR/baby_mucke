@@ -13,8 +13,10 @@ final class StationStore: ObservableObject {
     private let defaults = UserDefaults.standard
     private let lastPlayedKey = "lastPlayedStationID"
 
-    init() {
-        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+    // `directory` ist standardmaessig der App-Support-Ordner und wird nur fuer
+    // Tests injiziert, damit diese nicht auf der gemeinsamen stations.json arbeiten.
+    init(directory: URL? = nil) {
+        let base = directory ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         dir = base.appendingPathComponent("BabyMucke", isDirectory: true)
         stationsURL = dir.appendingPathComponent("stations.json")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)

@@ -8,7 +8,8 @@ Stand: 2026-06-25
 - Aktuelle App-Version: **0.1.11**.
 - iOS-Projekt `BabyMucke.xcodeproj` existiert und baut fuer den iOS-Simulator.
 - Build-Befehl: `./scripts/build-simulator.sh`.
-- Unit-Test-Target `BabyMuckeTests` (31 Tests fuer die reine Logik) vorhanden;
+- Unit-Test-Target `BabyMuckeTests` (45 Tests: reine Logik plus Verlauf-Pruning
+  und Sender-Store ueber injizierbaren Ordner) vorhanden;
   Lauf: `./scripts/run-tests.sh` (waehlt Simulator automatisch).
 - Audio-Engine fuer den MVP: **AVPlayer zuerst**.
 - Portiert/angelegt: Sender-Modelle, Sender-Store, Playlist-Aufloesung, ICY-Metadatenleser,
