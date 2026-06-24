@@ -10,8 +10,19 @@ final class ICYMetadataReader: NSObject, URLSessionDataDelegate {
     private var session: URLSession?
     private var task: URLSessionDataTask?
 
-    // Parser-Zustand. URLSessionDataDelegate ruft diese Methoden seriell auf
-    // seiner Delegate-Queue auf, deshalb braucht der Parser kein eigenes Locking.
+    // Eigene serielle Delegate-Queue fuer ALLE Callbacks. Sie wird ueber
+    // Session-Wechsel hinweg wiederverwendet, damit Callbacks einer alten und
+    // einer frisch gestarteten Session nie nebenlaeufig laufen. Der Parser-Zustand
+    // unten wird ausschliesslich auf dieser Queue angefasst (in didReceive ...),
+    // nie vom aufrufenden Main-Thread — deshalb braucht er kein Locking.
+    private let delegateQueue: OperationQueue = {
+        let q = OperationQueue()
+        q.maxConcurrentOperationCount = 1
+        q.name = "de.babymucke.icy-metadata"
+        return q
+    }()
+
+    // Parser-Zustand. Nur auf delegateQueue gelesen/geschrieben (siehe oben).
     private var metaint = 0
     private var skip = 0
     private var inMeta = false
@@ -23,7 +34,7 @@ final class ICYMetadataReader: NSObject, URLSessionDataDelegate {
         stop()
         let cfg = URLSessionConfiguration.ephemeral
         cfg.timeoutIntervalForRequest = 20
-        let s = URLSession(configuration: cfg, delegate: self, delegateQueue: nil)
+        let s = URLSession(configuration: cfg, delegate: self, delegateQueue: delegateQueue)
         session = s
         var req = URLRequest(url: url)
         req.setValue("1", forHTTPHeaderField: "Icy-MetaData")
@@ -33,28 +44,34 @@ final class ICYMetadataReader: NSObject, URLSessionDataDelegate {
         t.resume()
     }
 
+    // Nur Session/Task abbauen (laeuft auf dem aufrufenden Main-Thread). Der
+    // Parser-Zustand wird hier bewusst NICHT zurueckgesetzt — das geschieht beim
+    // naechsten Stream in didReceive response auf der Delegate-Queue, damit es
+    // nie mit einem noch laufenden Callback der alten Session kollidiert.
     func stop() {
         task?.cancel()
         task = nil
         session?.invalidateAndCancel()
         session = nil
+    }
+
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask,
+                    didReceive response: URLResponse,
+                    completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
+        // Frischer Stream: Parser-Zustand hier auf der Delegate-Queue zuruecksetzen
+        // (statt im main-seitigen stop()), damit kein Datenrennen entsteht.
         metaint = 0
         skip = 0
         inMeta = false
         metaLeft = 0
         buf.removeAll(keepingCapacity: false)
         lastTitle = ""
-    }
 
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask,
-                    didReceive response: URLResponse,
-                    completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         let http = response as? HTTPURLResponse
         if let v = http?.value(forHTTPHeaderField: "icy-metaint") ?? http?.value(forHTTPHeaderField: "Icy-MetaInt"),
            let n = Int(v), n > 0 {
             metaint = n
             skip = n
-            inMeta = false
             completionHandler(.allow)
         } else {
             completionHandler(.cancel)
