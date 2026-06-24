@@ -53,7 +53,10 @@ struct SeedStation: Decodable {
     }
 }
 
-// App-Version an einer Stelle fuer UI, Plist und Releases.
+// App-Version. Wird aus dem Bundle gelesen (CFBundleShortVersionString =
+// $(MARKETING_VERSION)), damit sie nicht gegenueber project.pbxproj/VERSION
+// driften kann. Einziger Konsument ist der HTTP-User-Agent in PlaylistResolver
+// und ICYMetadataReader.
 enum AppInfo {
-    static let version = "0.1.2"
+    static let version = (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? "0.1.10"
 }
