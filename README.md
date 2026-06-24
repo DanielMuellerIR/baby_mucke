@@ -26,6 +26,7 @@ The whole flow is scriptable — handy for automation and AI agents. Requires ma
 
 ```bash
 ./scripts/build-simulator.sh                          # build for the iOS Simulator (no code signing)
+./scripts/run-tests.sh                                # run the unit tests (auto-selects a simulator)
 ```
 
 Install and launch in a booted simulator:

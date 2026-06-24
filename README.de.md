@@ -26,6 +26,7 @@ Der gesamte Ablauf ist skriptbar — praktisch für Automatisierung und KI-Agent
 
 ```bash
 ./scripts/build-simulator.sh                          # Build für den iOS-Simulator (ohne Code-Signing)
+./scripts/run-tests.sh                                # Unit-Tests im iOS-Simulator (wählt Simulator automatisch)
 ```
 
 In einem laufenden Simulator installieren und starten:
