@@ -126,10 +126,10 @@ final class RadioPlayer: ObservableObject {
         self.player = player
 
         itemStatusObservation = item.observe(\.status, options: [.new]) { [weak self] item, _ in
-            Task { @MainActor in self?.handleItemStatus(item.status, error: item.error) }
+            Task { @MainActor in self?.handleItemStatus(item.status, error: item.error, observedItem: item) }
         }
         timeControlObservation = player.observe(\.timeControlStatus, options: [.initial, .new]) { [weak self] player, _ in
-            Task { @MainActor in self?.handleTimeControlStatus(player.timeControlStatus) }
+            Task { @MainActor in self?.handleTimeControlStatus(player.timeControlStatus, observedPlayer: player) }
         }
         timeObserver = player.addPeriodicTimeObserver(
             forInterval: CMTime(seconds: 1, preferredTimescale: 2),
@@ -159,7 +159,10 @@ final class RadioPlayer: ObservableObject {
         }
     }
 
-    private func handleItemStatus(_ status: AVPlayerItem.Status, error: Error?) {
+    private func handleItemStatus(_ status: AVPlayerItem.Status, error: Error?, observedItem: AVPlayerItem) {
+        // Verspaetete KVO-Callbacks eines bereits ersetzten Items ignorieren, damit
+        // ein alter Fehler nicht die frisch gestartete Wiedergabe stoert.
+        guard observedItem === player?.currentItem else { return }
         switch status {
         case .readyToPlay:
             if !isPlaying { setStatus("Puffert ...") }
@@ -178,8 +181,9 @@ final class RadioPlayer: ObservableObject {
         refreshNowPlayingCenter()
     }
 
-    private func handleTimeControlStatus(_ status: AVPlayer.TimeControlStatus) {
-        guard currentStation != nil else { return }
+    private func handleTimeControlStatus(_ status: AVPlayer.TimeControlStatus, observedPlayer: AVPlayer) {
+        // Nur Callbacks des aktuellen Players auswerten (siehe handleItemStatus).
+        guard observedPlayer === player, currentStation != nil else { return }
         switch status {
         case .playing:
             markPlaybackStarted()
