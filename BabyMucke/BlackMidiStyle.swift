@@ -30,25 +30,6 @@ extension Color {
     }
 }
 
-struct NeonIconButtonStyle: ButtonStyle {
-    var tint: Color = BlackMidiStyle.cyan
-    var filled = false
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.system(size: 17, weight: .bold))
-            .foregroundStyle(filled ? BlackMidiStyle.background : tint)
-            .frame(width: 42, height: 42)
-            .background(filled ? tint : BlackMidiStyle.surfaceRaised)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(tint.opacity(configuration.isPressed ? 0.95 : 0.55), lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .scaleEffect(configuration.isPressed ? 0.96 : 1)
-    }
-}
-
 struct PlaybackButtonStyle: ButtonStyle {
     var tint: Color = BlackMidiStyle.cyan
     var active = false
