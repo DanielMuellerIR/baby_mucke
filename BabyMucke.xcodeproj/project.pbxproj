@@ -24,6 +24,11 @@
 		A00000000000000000000015 /* seed-stations.example.json in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000015 /* seed-stations.example.json */; };
 		A00000000000000000000016 /* seed-stations.json in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000018 /* seed-stations.json */; };
 		A00000000000000000000021 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000021 /* Localizable.xcstrings */; };
+		A00000000000000000000031 /* SongEntrySplitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000031 /* SongEntrySplitTests.swift */; };
+		A00000000000000000000032 /* MusicLinksTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000032 /* MusicLinksTests.swift */; };
+		A00000000000000000000033 /* PlaylistResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000033 /* PlaylistResolverTests.swift */; };
+		A00000000000000000000034 /* ColorHexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000034 /* ColorHexTests.swift */; };
+		A00000000000000000000035 /* StationDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000035 /* StationDecodingTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +51,12 @@
 		B00000000000000000000017 /* BabyMucke.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabyMucke.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00000000000000000000018 /* seed-stations.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "seed-stations.json"; sourceTree = "<group>"; };
 		B00000000000000000000021 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		B00000000000000000000030 /* BabyMuckeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BabyMuckeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B00000000000000000000031 /* SongEntrySplitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongEntrySplitTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000032 /* MusicLinksTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicLinksTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000033 /* PlaylistResolverTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistResolverTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000034 /* ColorHexTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHexTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000035 /* StationDecodingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StationDecodingTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				D00000000000000000000002 /* BabyMucke */,
+				D00000000000000000000005 /* BabyMuckeTests */,
 				D00000000000000000000004 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -104,8 +116,21 @@
 			isa = PBXGroup;
 			children = (
 				B00000000000000000000017 /* BabyMucke.app */,
+				B00000000000000000000030 /* BabyMuckeTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D00000000000000000000005 /* BabyMuckeTests */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000031 /* SongEntrySplitTests.swift */,
+				B00000000000000000000032 /* MusicLinksTests.swift */,
+				B00000000000000000000033 /* PlaylistResolverTests.swift */,
+				B00000000000000000000034 /* ColorHexTests.swift */,
+				B00000000000000000000035 /* StationDecodingTests.swift */,
+			);
+			path = BabyMuckeTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -128,6 +153,22 @@
 			productReference = B00000000000000000000017 /* BabyMucke.app */;
 			productType = "com.apple.product-type.application";
 		};
+		E00000000000000000000003 /* BabyMuckeTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F00000000000000000000010 /* Build configuration list for PBXNativeTarget "BabyMuckeTests" */;
+			buildPhases = (
+				G00000000000000000000003 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				H00000000000000000000001 /* PBXTargetDependency */,
+			);
+			name = BabyMuckeTests;
+			productName = BabyMuckeTests;
+			productReference = B00000000000000000000030 /* BabyMuckeTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -140,6 +181,10 @@
 				TargetAttributes = {
 					E00000000000000000000001 = {
 						CreatedOnToolsVersion = 26.5;
+					};
+					E00000000000000000000003 = {
+						CreatedOnToolsVersion = 26.5;
+						TestTargetID = E00000000000000000000001;
 					};
 				};
 			};
@@ -158,6 +203,7 @@
 			projectRoot = "";
 			targets = (
 				E00000000000000000000001 /* BabyMucke */,
+				E00000000000000000000003 /* BabyMuckeTests */,
 			);
 		};
 /* End PBXProject section */
@@ -197,7 +243,37 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		G00000000000000000000003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000031 /* SongEntrySplitTests.swift in Sources */,
+				A00000000000000000000032 /* MusicLinksTests.swift in Sources */,
+				A00000000000000000000033 /* PlaylistResolverTests.swift in Sources */,
+				A00000000000000000000034 /* ColorHexTests.swift in Sources */,
+				A00000000000000000000035 /* StationDecodingTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		H00000000000000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E00000000000000000000001 /* BabyMucke */;
+			targetProxy = I00000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXContainerItemProxy section */
+		I00000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E00000000000000000000002 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E00000000000000000000001;
+			remoteInfo = BabyMucke;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin XCBuildConfiguration section */
 		F00000000000000000000004 /* Debug */ = {
@@ -362,6 +438,46 @@
 			};
 			name = Release;
 		};
+		F00000000000000000000011 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 11;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.10;
+				PRODUCT_BUNDLE_IDENTIFIER = de.babymucke.BabyMuckeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BabyMucke.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BabyMucke";
+			};
+			name = Debug;
+		};
+		F00000000000000000000012 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 11;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 0.1.10;
+				PRODUCT_BUNDLE_IDENTIFIER = de.babymucke.BabyMuckeTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BabyMucke.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BabyMucke";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -379,6 +495,15 @@
 			buildConfigurations = (
 				F00000000000000000000004 /* Debug */,
 				F00000000000000000000005 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F00000000000000000000010 /* Build configuration list for PBXNativeTarget "BabyMuckeTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F00000000000000000000011 /* Debug */,
+				F00000000000000000000012 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

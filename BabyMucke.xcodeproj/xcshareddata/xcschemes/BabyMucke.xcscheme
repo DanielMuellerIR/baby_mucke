@@ -29,6 +29,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E00000000000000000000003"
+               BuildableName = "BabyMuckeTests.xctest"
+               BlueprintName = "BabyMuckeTests"
+               ReferencedContainer = "container:BabyMucke.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
