@@ -22,6 +22,11 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!-- Internet-Radio spielt beliebige, vom Nutzer eingetragene Stream-URLs ab.
+	     Viele oeffentliche Sender liefern nur ueber unverschluesseltes HTTP
+	     (in der mitgelieferten Senderliste rund die Haelfte). Da die Hosts nicht
+	     vorab bekannt sind, ist eine domain-spezifische NSExceptionDomains-Liste
+	     nicht moeglich; der pauschale Klartext-Zugriff ist hier fachlich noetig. -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

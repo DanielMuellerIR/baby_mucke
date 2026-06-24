@@ -22,8 +22,6 @@ SOFTWARE.
 
 ---
 
-Third-party components retain their own licenses. In particular, this app
-dynamically links VLCKit / libVLC, which is licensed under the GNU Lesser
-General Public License v2.1 or later (LGPL-2.1-or-later). See THIRD-PARTY.md
-for details and obligations. The MIT license above covers this project's own
-source code, not the bundled third-party frameworks.
+This app bundles no third-party frameworks; audio playback uses Apple's own
+AVFoundation. The app icon was generated locally and the user interface uses
+system fonts.
