@@ -103,6 +103,11 @@ final class RadioPlayer: ObservableObject {
         playStartedAt = nil
         setStatus("Gestoppt")
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
+        // Audio-Session freigeben, damit andere Apps (Musik, Podcasts) nach dem
+        // Stoppen wieder weiterlaufen koennen. Best-effort wie der Rest hier.
+        // Bewusst nur in stop(), nicht in resetPlaybackObjects() — letzteres laeuft
+        // auch beim Senderwechsel, wo direkt wieder aktiviert wird.
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 
     func toggle(_ station: Station) {
