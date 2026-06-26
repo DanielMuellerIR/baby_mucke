@@ -20,6 +20,11 @@ final class RadioPlayer: ObservableObject {
 
     private var player: AVPlayer?
     private let icy = ICYMetadataReader()
+    // Monoton wachsender Zaehler: wird bei jedem play()-Aufruf erhoehen.
+    // setNowPlaying verwirft Titel, deren Generation nicht mehr aktuell ist,
+    // damit verspätete icy-Callbacks einer alten Session keinen Phantom-Eintrag
+    // in den Verlauf schreiben oder den Titel dem falschen Sender zuordnen.
+    private var playGeneration: Int = 0
     private var resolveTask: Task<Void, Never>?
     private var itemStatusObservation: NSKeyValueObservation?
     private var timeControlObservation: NSKeyValueObservation?
@@ -27,9 +32,6 @@ final class RadioPlayer: ObservableObject {
     private var remoteCommandsConfigured = false
 
     init() {
-        icy.onTitle = { [weak self] title in
-            Task { @MainActor in self?.setNowPlaying(title) }
-        }
         configureRemoteCommands()
         history.pruneOnLaunchOrQuit()
     }
@@ -62,6 +64,13 @@ final class RadioPlayer: ObservableObject {
     }
 
     func play(_ station: Station) {
+        // Deaktivierte Sender nicht abspielen — kann z. B. auftreten, wenn der
+        // Lock-Screen-Steuerbefehl (Remote Control) den zuletzt gehoerten Sender
+        // erneut starten will, der inzwischen deaktiviert wurde.
+        guard station.enabled else {
+            setStatus("Sender deaktiviert", isError: true)
+            return
+        }
         #if DEBUG
         PlayerDiagnostics.logMemory("play '\(station.name)'")
         #endif
@@ -110,14 +119,6 @@ final class RadioPlayer: ObservableObject {
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 
-    func toggle(_ station: Station) {
-        if (isPlaying || isLoading), currentStation?.id == station.id {
-            stop()
-        } else {
-            play(station)
-        }
-    }
-
     private func start(url: URL) {
         guard activateAudioSession() else { return }
 
@@ -139,6 +140,17 @@ final class RadioPlayer: ObservableObject {
         }
 
         player.play()
+        // Generation vor icy.start() erhoehen und im Callback einfangen.
+        // So werden verspätete Titel-Callbacks einer abgebrochenen Session
+        // sicher verworfen (Phantom-Verlauf-Bug-Schutz).
+        playGeneration &+= 1
+        let capturedGeneration = playGeneration
+        icy.onTitle = { [weak self] title in
+            Task { @MainActor [weak self] in
+                guard let self, self.playGeneration == capturedGeneration else { return }
+                self.setNowPlaying(title)
+            }
+        }
         icy.start(url: url)
         setStatus("Puffert ...")
         isLoading = true

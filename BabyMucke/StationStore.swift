@@ -1,4 +1,5 @@
 import Foundation
+import os
 
 // Haelt die Senderliste und speichert sie im Application-Support-Ordner.
 // Die JSON-Struktur bleibt kompatibel zur Mac-App, damit Listen spaeter einfach
@@ -34,7 +35,9 @@ final class StationStore: ObservableObject {
     var lastPlayed: Station? {
         guard let raw = defaults.string(forKey: lastPlayedKey),
               let id = UUID(uuidString: raw) else { return nil }
-        return stations.first { $0.id == id }
+        // Deaktivierte Sender nicht zurueckgeben — ein zwischenzeitlich
+        // deaktivierter Sender soll beim App-Start nicht als "aktiver Sender" gelten.
+        return stations.first { $0.id == id && $0.enabled }
     }
 
     // Reihenfolge fuer die Hauptliste: Favorit, zuletzt gespielt, danach alle
@@ -103,6 +106,11 @@ final class StationStore: ObservableObject {
 
     func delete(_ station: Station) {
         stations.removeAll { $0.id == station.id }
+        // Verwaisten lastPlayed-Eintrag bereinigen: eine neu angelegte Station
+        // bekaeme eine andere UUID, wuerde aber sonst auf diesen Phantom-Eintrag treffen.
+        if defaults.string(forKey: lastPlayedKey) == station.id.uuidString {
+            defaults.removeObject(forKey: lastPlayedKey)
+        }
         saveStations()
     }
 
@@ -122,17 +130,22 @@ final class StationStore: ObservableObject {
 
     // MARK: - Seed
 
+    // Logger fuer Bundle-Lade-Fehler (sichtbar in Xcode-Konsole und Console.app).
+    private static let log = Logger(subsystem: "de.babymucke.BabyMucke", category: "StationStore")
+
     private func seededStations() -> [Station] {
-        let candidates = [
-            ("seed-stations", "json"),
-            ("seed-stations.example", "json")
-        ]
-        for candidate in candidates {
-            if let url = Bundle.main.url(forResource: candidate.0, withExtension: candidate.1),
-               let data = try? Data(contentsOf: url),
-               let seeds = try? JSONDecoder().decode([SeedStation].self, from: data),
-               !seeds.isEmpty {
-                return seeds.map { $0.toStation() }
+        // Nur noch seed-stations.json (seed-stations.example.json wurde entfernt).
+        if let url = Bundle.main.url(forResource: "seed-stations", withExtension: "json") {
+            do {
+                let data = try Data(contentsOf: url)
+                let seeds = try JSONDecoder().decode([SeedStation].self, from: data)
+                if !seeds.isEmpty { return seeds.map { $0.toStation() } }
+                Self.log.warning("seed-stations.json ist leer — falle auf builtinDefaults zurueck")
+            } catch {
+                // Beschaedigte Bundle-Datei wuerde stillschweigend zur Demoliste fuehren.
+                // Hier explizit loggen, damit der Fehler nicht unbemerkt bleibt.
+                Self.log.error("seed-stations.json konnte nicht geladen werden: \(error)")
+                assertionFailure("seed-stations.json Ladefehler: \(error)")
             }
         }
         return Self.builtinDefaults.map { $0.toStation() }
@@ -159,19 +172,6 @@ final class StationStore: ObservableObject {
     }
 
     // MARK: - Bearbeiten
-
-    func setFavorite(_ station: Station) {
-        for i in stations.indices {
-            stations[i].favorite = (stations[i].id == station.id)
-        }
-        saveStations()
-    }
-
-    func toggleEnabled(_ station: Station) {
-        guard let i = stations.firstIndex(where: { $0.id == station.id }) else { return }
-        stations[i].enabled.toggle()
-        saveStations()
-    }
 
     private func normalizedStations(_ imported: [Station]) throws -> [Station] {
         var seen = Set<UUID>()
