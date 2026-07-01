@@ -60,6 +60,15 @@ final class RadioPlayer: ObservableObject {
     func refreshCurrentStation(_ station: Station) {
         guard currentStation?.id == station.id else { return }
         currentStation = station
+        // Wird der gerade laufende Sender im Edit-Sheet ueber den "Aktiv"-Toggle
+        // deaktiviert, darf er nicht weiterspielen — sonst zeigt die Liste ihn als
+        // deaktiviert, waehrend der Player ihn noch abspielt. Analog zum
+        // enabled-Guard in play() hier stoppen und Status setzen.
+        if !station.enabled && (isPlaying || isLoading) {
+            stop()
+            setStatus("Sender deaktiviert", isError: true)
+            return
+        }
         refreshNowPlayingCenter()
     }
 
@@ -85,11 +94,18 @@ final class RadioPlayer: ObservableObject {
         playStartedAt = nil
         refreshNowPlayingCenter()
 
+        // codereview-ok: kein separates Steckenbleiben — steigt der Task nicht in MainActor.run ein, wird start()/setStatus("Puffert") nie erreicht; die enge Race ist mit dem Cancel-Check im MainActor.run-Block erledigt (2026-07-01)
         resolveTask = Task { [weak self] in
             let resolved = await PlaylistResolver.resolve(station.url)
             guard let self else { return }
             if Task.isCancelled { return }
             await MainActor.run {
+                // Erneuter Abbruch-Check IM MainActor-Block: Zwischen dem Check in
+                // Z.91 und diesem Body kann ein stop()/play() dazwischenfunken, das
+                // via resetPlaybackObjects() diesen resolveTask cancelt. Ohne den
+                // erneuten Check wuerde start() trotzdem einen neuen AVPlayer+ICY
+                // aufbauen und currentStation/isLoading/isPlaying ueberschreiben.
+                if Task.isCancelled { return }
                 guard let url = resolved else {
                     self.isLoading = false
                     self.setStatus("Ungültige URL", isError: true)
@@ -102,6 +118,7 @@ final class RadioPlayer: ObservableObject {
     }
 
     func stop() {
+        // codereview-ok: currentStation bleibt nach stop() bewusst gesetzt, damit PlayerBar/Remote-Commands den Sender fortsetzen koennen; nil setzen wuerde die Resume-Logik brechen (2026-07-01)
         #if DEBUG
         PlayerDiagnostics.logMemory("stop")
         #endif
@@ -218,6 +235,7 @@ final class RadioPlayer: ObservableObject {
     }
 
     private func markPlaybackStarted() {
+        // codereview-ok: resetPlaybackObjects() setzt player=nil; ein alter/queued Callback faellt durch diesen Guard, kein Phantom-Write moeglich (2026-07-01)
         guard player?.timeControlStatus == .playing else { return }
         if playStartedAt == nil { playStartedAt = Date() }
         isPlaying = true

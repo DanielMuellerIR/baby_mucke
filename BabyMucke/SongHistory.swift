@@ -84,7 +84,13 @@ final class SongHistory: ObservableObject {
     // Aufnahmen; die gibt es auf iOS nicht, hier also nur die Eintraege.
     func remove(olderThan cutoff: Date) {
         let before = entries.count
-        entries.removeAll { ($0.end ?? $0.start) < cutoff }
+        // Offene Eintraege (end == nil) laufen noch. Sie duerfen nie durch
+        // "aelter als X" entfernt werden, nur weil ihr Start alt ist — sonst
+        // verschwaende ein Titel, der laenger als das Zeitfenster durchlaeuft,
+        // mitten in der Wiedergabe aus dem Verlauf. Deshalb .distantFuture als
+        // Vergleichswert: Der offene Eintrag wird erst beim naechsten
+        // closeCurrent() (mit gesetztem Ende) prunebar.
+        entries.removeAll { ($0.end ?? .distantFuture) < cutoff }
         if entries.count != before { save() }
     }
 

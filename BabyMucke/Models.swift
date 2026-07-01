@@ -61,5 +61,6 @@ enum AppInfo {
     // Fallback bewusst versions-agnostisch ("dev"): er greift nur, wenn der
     // Bundle-Key fehlt (z.B. im Unit-Test), und landet allein im User-Agent —
     // ein Versionsliteral hier wuerde genau die Drift wieder einfuehren.
+    // codereview-ok: bewusst versions-agnostischer Fallback (greift nur ohne Bundle-Key, z.B. Unit-Test); ein Versionsliteral hier wuerde die Drift wieder einfuehren (2026-07-01)
     static let version = (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? "dev"
 }

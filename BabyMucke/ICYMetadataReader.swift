@@ -122,6 +122,7 @@ final class ICYMetadataReader: NSObject, URLSessionDataDelegate {
     // Latin-1 akzeptiert jedes Byte und muss deshalb letzter echter Fallback sein.
     private func decodeICY(_ bytes: [UInt8]) -> String {
         let data = Data(bytes)
+        // codereview-ok: Replacement-Zeichen-Check ist bereits da — bei U+FFFD faellt der Code korrekt weiter zu Windows-1251/CP932/ISO-Latin-1 (2026-07-01)
         if let u = String(data: data, encoding: .utf8), !u.contains("\u{FFFD}") {
             return u
         }
