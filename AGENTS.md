@@ -119,6 +119,14 @@ Empfehlung fuer die naechste Session:
 2. Verhalten von Background-Audio, Lock-Screen und Remote-Controls auf dem Geraet pruefen.
 3. Sender-Edit-/Import-/Export-Flows auf einem Geraet manuell durchklicken.
 4. Falls AVPlayer wichtige Sender nicht abspielt: MobileVLCKit-Variante planen und frueh einbauen.
+5. Spotify-Such-Button prueft: Landet auf der Spotify-Suchseite, aber das Suchfeld
+   bleibt leer (kein Treffer). Apple-Music-Button funktioniert. `MusicLinks.spotifySearchURL`
+   baut das dokumentierte Format `https://open.spotify.com/search/<query>` (mit %20) — der
+   URL-Bau ist also plausibel korrekt. Verdacht: Spotifys Web-Player traegt den Suchbegriff
+   nur eingeloggt / in der installierten App durch; ausgeloggt zeigt er die Preview-Seite
+   ohne Query. MUSS mit echtem Spotify-Account bzw. installierter Spotify-App verifiziert
+   werden. Falls es auch dann leer bleibt: `spotify:search:<query>`-URI (App) bzw. eine
+   Query-Param-Variante testen. (Stand 2026-07-08, on-device beobachtet.)
 
 ## Bewusst spaeter
 
