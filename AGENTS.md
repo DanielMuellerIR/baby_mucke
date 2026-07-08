@@ -56,10 +56,14 @@ Fuer den MVP ist **AVPlayer zuerst** umgesetzt:
    groesseres Dependency-/Lizenz-/Build-Thema und potenziell mehr Aufwand fuer Background-Audio
    und Systemintegration.
 
-Empfehlung fuer die naechste Session:
+Stand nach On-Device-Test (2026-07-08, echtes iPhone):
 
-- AVPlayer auf einem echten iPhone mit wichtigen Sendern aus der Mac-App testen.
-- Wenn relevante Sender wegen Codec/Container scheitern: frueh auf MobileVLCKit wechseln.
+- AVPlayer spielt auf dem Geraet auch **Ogg/Opus- und Ogg/Vorbis-Streams** ab
+  (Hirschmilch Progressive `.opus`, RainWave Chiptune Ogg/Opus, Kohina Ogg/Vorbis
+  laufen einwandfrei). Die frueher vermutete Codec-Luecke besteht fuer die reine
+  Wiedergabe also NICHT — MobileVLCKit ist dafuer aktuell nicht noetig.
+- ABER: Diese Ogg-Icecast-Streams liefern keinen Live-Titel -> kein Verlaufs-
+  Eintrag (Details siehe "## Fallen / Agent-Hinweise").
 
 ## Offene Fragen an Daniel
 
@@ -118,7 +122,9 @@ Empfehlung fuer die naechste Session:
 1. Echten Device-Test mit MP3/AAC-Stream und mindestens einem problematischen Mac-App-Stream machen.
 2. Verhalten von Background-Audio, Lock-Screen und Remote-Controls auf dem Geraet pruefen.
 3. Sender-Edit-/Import-/Export-Flows auf einem Geraet manuell durchklicken.
-4. Falls AVPlayer wichtige Sender nicht abspielt: MobileVLCKit-Variante planen und frueh einbauen.
+4. MobileVLCKit ist fuer die Wiedergabe NICHT noetig (AVPlayer spielt on-device
+   auch Ogg/Opus/Vorbis, verifiziert 2026-07-08). Nur falls ein Sender WIRKLICH
+   nicht spielt (nicht nur ohne Titel/Verlauf), erneut abwaegen.
 5. Spotify-Such-Button prueft: Landet auf der Spotify-Suchseite, aber das Suchfeld
    bleibt leer (kein Treffer). Apple-Music-Button funktioniert. `MusicLinks.spotifySearchURL`
    baut das dokumentierte Format `https://open.spotify.com/search/<query>` (mit %20) — der
@@ -128,8 +134,23 @@ Empfehlung fuer die naechste Session:
    werden. Falls es auch dann leer bleibt: `spotify:search:<query>`-URI (App) bzw. eine
    Query-Param-Variante testen. (Stand 2026-07-08, on-device beobachtet.)
 
+## Fallen / Agent-Hinweise
+
+- **Ogg/Opus/Vorbis-Streams: Wiedergabe ja, Verlauf nein.** AVPlayer spielt diese
+  Streams on-device ab (verifiziert 2026-07-08: Hirschmilch Progressive, RainWave
+  Chiptune, Kohina), sie erscheinen aber NIE im Song-Verlauf. Grund: Der
+  `ICYMetadataReader` liest die Shoutcast/Icecast-ICY-Metadaten ueber das
+  `icy-metaint`-Interleaving — das bieten praktisch nur MP3/AAC-Mounts. Ein
+  Ogg-Mount sendet keinen `icy-metaint`-Header, worauf der Reader die
+  Metadaten-Verbindung bewusst abbricht (`didReceive response` -> `.cancel`-Zweig).
+  Den Live-Titel tragen Ogg-Streams stattdessen in-band in Ogg-Comment-Paketen
+  (Vorbis/Opus comment), die der Reader nicht dekodiert. Kein Bug, sondern
+  Container-Grenze. Ein Titel-Feed fuer Ogg wuerde einen eigenen Ogg-Page-/
+  Comment-Parser brauchen (bewusst spaeter, siehe unten).
+
 ## Bewusst spaeter
 
+- Ogg-/Opus-Metadaten (Ogg-Comment) fuer den Verlauf lesen — siehe "Fallen".
 - Visualizer.
 - Aufnahme und Song-Export.
 - iCloud-Sync zwischen Mac und iPhone.
