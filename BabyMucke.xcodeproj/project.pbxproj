@@ -32,6 +32,16 @@
 		A00000000000000000000037 /* StationStoreLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000037 /* StationStoreLogicTests.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		I00000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E00000000000000000000002 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E00000000000000000000001;
+			remoteInfo = BabyMucke;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		B00000000000000000000001 /* BabyMuckeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabyMuckeApp.swift; sourceTree = "<group>"; };
 		B00000000000000000000002 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -269,16 +279,6 @@
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXContainerItemProxy section */
-		I00000000000000000000001 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E00000000000000000000002 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E00000000000000000000001;
-			remoteInfo = BabyMucke;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin XCBuildConfiguration section */
 		F00000000000000000000004 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -287,7 +287,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 14;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 9QSWKSR4NQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BabyMucke/Info.plist;
@@ -313,7 +313,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 14;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 9QSWKSR4NQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = BabyMucke/Info.plist;
