@@ -58,17 +58,29 @@ final class RadioPlayer: ObservableObject {
     }
 
     func refreshCurrentStation(_ station: Station) {
-        guard currentStation?.id == station.id else { return }
-        currentStation = station
+        guard let current = currentStation, current.id == station.id else { return }
+
         // Wird der gerade laufende Sender im Edit-Sheet ueber den "Aktiv"-Toggle
         // deaktiviert, darf er nicht weiterspielen — sonst zeigt die Liste ihn als
         // deaktiviert, waehrend der Player ihn noch abspielt. Analog zum
         // enabled-Guard in play() hier stoppen und Status setzen.
         if !station.enabled && (isPlaying || isLoading) {
+            currentStation = station
             stop()
             setStatus("Sender deaktiviert", isError: true)
             return
         }
+
+        // Wurde die Stream-URL des gerade laufenden/ladenden Senders geaendert
+        // (z. B. im Edit-Sheet korrigiert), spielt das alte AVPlayer-Item sonst
+        // weiter die alte URL, waehrend die Liste bereits die neue zeigt. Deshalb
+        // den Sender mit der neuen URL neu laden. play() setzt currentStation selbst.
+        if current.url != station.url && (isPlaying || isLoading) {
+            play(station)
+            return
+        }
+
+        currentStation = station
         refreshNowPlayingCenter()
     }
 
@@ -80,6 +92,13 @@ final class RadioPlayer: ObservableObject {
             setStatus("Sender deaktiviert", isError: true)
             return
         }
+        prepareForPlay(station)
+        resolveAndStart(station)
+    }
+
+    // Synchroner Teil von play(): den alten Player abbauen und den UI-Zustand auf
+    // "laedt gerade" setzen, bevor die (asynchrone) URL-Aufloesung anlaeuft.
+    private func prepareForPlay(_ station: Station) {
         #if DEBUG
         PlayerDiagnostics.logMemory("play '\(station.name)'")
         #endif
@@ -93,18 +112,23 @@ final class RadioPlayer: ObservableObject {
         isPlaying = false
         playStartedAt = nil
         refreshNowPlayingCenter()
+    }
 
+    // Asynchroner Teil von play(): Playlist-/Redirect-URL aufloesen und dann den
+    // eigentlichen AVPlayer starten. Laeuft als abbrechbarer Task, damit ein
+    // schnelles stop()/play() die alte Aufloesung verwerfen kann.
+    private func resolveAndStart(_ station: Station) {
         // codereview-ok: kein separates Steckenbleiben — steigt der Task nicht in MainActor.run ein, wird start()/setStatus("Puffert") nie erreicht; die enge Race ist mit dem Cancel-Check im MainActor.run-Block erledigt (2026-07-01)
         resolveTask = Task { [weak self] in
             let resolved = await PlaylistResolver.resolve(station.url)
             guard let self else { return }
             if Task.isCancelled { return }
             await MainActor.run {
-                // Erneuter Abbruch-Check IM MainActor-Block: Zwischen dem Check in
-                // Z.91 und diesem Body kann ein stop()/play() dazwischenfunken, das
-                // via resetPlaybackObjects() diesen resolveTask cancelt. Ohne den
-                // erneuten Check wuerde start() trotzdem einen neuen AVPlayer+ICY
-                // aufbauen und currentStation/isLoading/isPlaying ueberschreiben.
+                // Erneuter Abbruch-Check IM MainActor-Block: Zwischen dem synchronen
+                // Setup in prepareForPlay und diesem Body kann ein stop()/play()
+                // dazwischenfunken, das via resetPlaybackObjects() diesen resolveTask
+                // cancelt. Ohne den erneuten Check wuerde start() trotzdem einen neuen
+                // AVPlayer+ICY aufbauen und currentStation/isLoading/isPlaying ueberschreiben.
                 if Task.isCancelled { return }
                 guard let url = resolved else {
                     self.isLoading = false
@@ -162,8 +186,11 @@ final class RadioPlayer: ObservableObject {
         // sicher verworfen (Phantom-Verlauf-Bug-Schutz).
         playGeneration &+= 1
         let capturedGeneration = playGeneration
+        // codereview-ok: onTitle wird NICHT in ICYMetadataReader.stop() genullt — start() ruft stop() als erste Zeile, das wuerde den gerade gesetzten Callback sofort wieder loeschen; verspaetete Callbacks fangen wir stattdessen ueber capturedGeneration ab (2026-07-08)
         icy.onTitle = { [weak self] title in
-            Task { @MainActor [weak self] in
+            // Inneres [weak self] weggelassen: self ist hier schon das (schwache)
+            // Optional der aeusseren Closure, ein erneutes weak-Capture waere redundant.
+            Task { @MainActor in
                 guard let self, self.playGeneration == capturedGeneration else { return }
                 self.setNowPlaying(title)
             }
@@ -237,6 +264,16 @@ final class RadioPlayer: ObservableObject {
     private func markPlaybackStarted() {
         // codereview-ok: resetPlaybackObjects() setzt player=nil; ein alter/queued Callback faellt durch diesen Guard, kein Phantom-Write moeglich (2026-07-01)
         guard player?.timeControlStatus == .playing else { return }
+        // Der periodische Time-Observer diente nur dazu, den Start der Wiedergabe
+        // zuverlaessig zu erkennen (als Ergaenzung zur timeControlStatus-KVO).
+        // Sobald sie laeuft, ist er ueberfluessig und wuerde sonst jede halbe
+        // Sekunde setStatus()/refreshNowPlayingCenter() umsonst neu aufrufen.
+        // Deshalb hier einmalig entfernen (resetPlaybackObjects() nullt den Token
+        // beim Senderwechsel, ein Doppel-Remove kann also nicht passieren).
+        if let timeObserver {
+            player?.removeTimeObserver(timeObserver)
+            self.timeObserver = nil
+        }
         if playStartedAt == nil { playStartedAt = Date() }
         isPlaying = true
         isLoading = false

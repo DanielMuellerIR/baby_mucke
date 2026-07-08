@@ -36,6 +36,7 @@ struct HistoryView: View {
                     .padding(.bottom, 12)
                 }
                 .onAppear { syncToNewest(using: proxy, animated: false) }
+                // codereview-ok: beobachtet bewusst das @Published entries-Array direkt — ein "dediziertes Signal" waere ein API-Bruch ohne konkreten Gewinn (2026-07-08)
                 .onChange(of: radioPlayer.history.entries) { _, _ in
                     syncToNewest(using: proxy, animated: true)
                 }
@@ -66,6 +67,7 @@ struct HistoryView: View {
 
             // Verlauf-Loesch-Menue, oben rechts wie der Bearbeiten-Button der
             // Senderliste. Loescht nur Verlaufs-Eintraege (per Zeitstempel).
+            // codereview-ok: alle Menue-Titel sind LocalizedStringKeys und in Localizable.xcstrings uebersetzt — kein hardcodierter Text (2026-07-08)
             Menu {
                 Button("Älter als 1 Tag löschen") { removeOlderThan(.day, 1) }
                 Button("Älter als 3 Tage löschen") { removeOlderThan(.day, 3) }
@@ -184,7 +186,10 @@ struct HistoryView: View {
     private func deleteSelected() {
         guard let selectedEntry else { return }
         radioPlayer.history.delete(selectedEntry)
-        selectedEntryID = nil
+        // Kein vorheriges selectedEntryID = nil noetig: ensureSelection() sieht,
+        // dass die bisherige Auswahl nicht mehr in entries steckt, und waehlt den
+        // neuesten Eintrag. (Der onChange-Pfad ruft ensureSelection() beim naechsten
+        // View-Update zusaetzlich; dieser direkte Aufruf haelt die Auswahl sofort gueltig.)
         ensureSelection()
     }
 }

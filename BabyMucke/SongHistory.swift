@@ -34,6 +34,20 @@ final class SongHistory: ObservableObject {
     private let shortImmediate: TimeInterval = 5
     private let shortLaunchQuit: TimeInterval = 20
 
+    // ISO-8601-Coder fuer die verlauf.json. Nur hier genutzt, deshalb als private
+    // statische Helfer statt globaler JSONDecoder/JSONEncoder-Extensions.
+    private static let isoDecoder: JSONDecoder = {
+        let d = JSONDecoder()
+        d.dateDecodingStrategy = .iso8601
+        return d
+    }()
+    private static let isoEncoder: JSONEncoder = {
+        let e = JSONEncoder()
+        e.dateEncodingStrategy = .iso8601
+        e.outputFormatting = [.prettyPrinted, .sortedKeys]
+        return e
+    }()
+
     // `directory` ist standardmaessig der App-Support-Ordner und wird nur fuer
     // Tests injiziert, damit diese nicht auf der gemeinsamen verlauf.json arbeiten.
     init(directory: URL? = nil) {
@@ -111,32 +125,20 @@ final class SongHistory: ObservableObject {
 
     private func load() {
         guard let data = try? Data(contentsOf: fileURL),
-              let decoded = try? JSONDecoder.iso.decode([SongEntry].self, from: data)
+              let decoded = try? Self.isoDecoder.decode([SongEntry].self, from: data)
         else { return }
         entries = decoded
+        // Ein beim letzten Beenden/Absturz offen gebliebener Eintrag (end == nil)
+        // wird hier mit dem aktuellen Zeitpunkt geschlossen. Das ist bewusst eine
+        // Naeherung — die echte Endzeit ist unbekannt; "jetzt" haelt den Eintrag
+        // aber konsistent (geschlossen) und macht ihn regulaer prune-bar, statt
+        // ihn dauerhaft als "laeuft noch" zu fuehren.
         closeCurrent()
         pruneOnLaunchOrQuit()
     }
 
     private func save() {
-        guard let data = try? JSONEncoder.isoPretty.encode(entries) else { return }
+        guard let data = try? Self.isoEncoder.encode(entries) else { return }
         try? data.write(to: fileURL, options: .atomic)
-    }
-}
-
-extension JSONDecoder {
-    static var iso: JSONDecoder {
-        let d = JSONDecoder()
-        d.dateDecodingStrategy = .iso8601
-        return d
-    }
-}
-
-extension JSONEncoder {
-    static var isoPretty: JSONEncoder {
-        let e = JSONEncoder()
-        e.dateEncodingStrategy = .iso8601
-        e.outputFormatting = [.prettyPrinted, .sortedKeys]
-        return e
     }
 }

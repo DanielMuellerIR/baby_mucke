@@ -37,6 +37,7 @@ struct StationListView: View {
             }
         }
         .background(BlackMidiStyle.panelFill)
+        // codereview-ok: fileImporter/fileExporter haengen bewusst am dauerhaft gemounteten Haupt-View statt im editMode-Block — dort wuerden sie beim Verlassen des Bearbeiten-Modus abgebaut, waehrend der System-Dialog noch offen ist (2026-07-08)
         .fileImporter(isPresented: $showingImporter, allowedContentTypes: [.json]) { result in
             handleImport(result)
         }
@@ -57,6 +58,7 @@ struct StationListView: View {
                 onDelete: draft.isNew ? nil : deleteDraft
             )
         }
+        // codereview-ok: "Senderliste" ist ein LocalizedStringKey und in Localizable.xcstrings uebersetzt — kein hardcodierter Text (2026-07-08)
         .alert("Senderliste", isPresented: alertIsPresented) {
             Button("OK", role: .cancel) { alertMessage = nil }
         } message: {
@@ -194,10 +196,7 @@ struct StationListView: View {
     }
 
     private func selectDefaultStationAfterListChange() {
-        let station = stationStore.lastPlayed
-            ?? stationStore.favorite
-            ?? stationStore.stationsForPlaybackList.first
-        if let station {
+        if let station = stationStore.defaultStation {
             radioPlayer.select(station)
         }
     }
@@ -262,6 +261,7 @@ private struct StationRow: View {
     }
 }
 
+// codereview-ok: StationDraft spiegelt Station bewusst als Bearbeitungs-Puffer — ein direktes @Binding<Station> wuerde live in den Store schreiben und "Abbrechen" um seine Verwerfen-Funktion bringen; originalID trennt Neu von Bearbeiten (2026-07-08)
 private struct StationDraft: Identifiable {
     var id: UUID
     var originalID: UUID?

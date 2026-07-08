@@ -32,9 +32,6 @@ struct ContentView: View {
         }
         .tint(BlackMidiStyle.cyan)
         .onAppear(perform: selectInitialStationIfNeeded)
-        .onChange(of: stationStore.stations) { _, _ in
-            selectInitialStationIfNeeded()
-        }
     }
 
     private func stationColumnWidth(for totalWidth: CGFloat) -> CGFloat {
@@ -45,10 +42,7 @@ struct ContentView: View {
 
     private func selectInitialStationIfNeeded() {
         guard !didSelectInitialStation else { return }
-        let station = stationStore.lastPlayed
-            ?? stationStore.favorite
-            ?? stationStore.stationsForPlaybackList.first
-        guard let station else { return }
+        guard let station = stationStore.defaultStation else { return }
         didSelectInitialStation = true
         radioPlayer.select(station)
     }

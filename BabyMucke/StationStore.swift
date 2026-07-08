@@ -28,6 +28,7 @@ final class StationStore: ObservableObject {
         stations.filter { $0.enabled }
     }
 
+    // codereview-ok: lineare Suche ueber die (kleine) Senderliste ist bewusst so — ein Cache muesste bei jeder Listenaenderung invalidiert werden und waere mehr Komplexitaet als Nutzen (2026-07-08)
     var favorite: Station? {
         stations.first { $0.favorite }
     }
@@ -38,6 +39,13 @@ final class StationStore: ObservableObject {
         // Deaktivierte Sender nicht zurueckgeben — ein zwischenzeitlich
         // deaktivierter Sender soll beim App-Start nicht als "aktiver Sender" gelten.
         return stations.first { $0.id == id && $0.enabled }
+    }
+
+    // Der Sender, mit dem die Wiedergabe starten soll, wenn gerade keiner aktiv
+    // ist: zuletzt gespielt, sonst Favorit, sonst der erste der Wiedergabeliste.
+    // Zentral hier, damit ContentView und StationListView dieselbe Wahl treffen.
+    var defaultStation: Station? {
+        lastPlayed ?? favorite ?? stationsForPlaybackList.first
     }
 
     // Reihenfolge fuer die Hauptliste: Favorit, zuletzt gespielt, danach alle
@@ -163,6 +171,7 @@ final class StationStore: ObservableObject {
         return (try? JSONDecoder().decode([SeedStation].self, from: Data(json.utf8))) ?? []
     }()
 
+    // codereview-ok: Vergleich ueber name UND url ist Absicht — sobald der Nutzer nur EINE der vier Demo-URLs (oder Namen) aendert, schlaegt allSatisfy fehl und die Liste bleibt unangetastet; es gibt keinen Datenverlust (2026-07-08)
     private func isLegacyDemoList(_ list: [Station]) -> Bool {
         let demo = Self.builtinDefaults
         guard list.count == demo.count else { return false }

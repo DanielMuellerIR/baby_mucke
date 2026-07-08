@@ -4,7 +4,9 @@ import SwiftUI
 // Grund, dazu Cyan, Pink, Gruen und Amber fuer klare Zustandsfarben.
 enum BlackMidiStyle {
     static let background = Color(hex: "#05060A")
-    static let panelFill = Color(hex: "#05060A").opacity(0.62)
+    // Leicht durchscheinender Panel-Grund: derselbe Hex-Wert wie `background`,
+    // nur mit Deckkraft — nicht als zweites Literal pflegen.
+    static let panelFill = background.opacity(0.62)
     static let surface = Color(hex: "#10131C")
     static let surfaceRaised = Color(hex: "#161A26")
     static let line = Color(hex: "#2D3347")
