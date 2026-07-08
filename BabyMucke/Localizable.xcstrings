@@ -3,188 +3,388 @@
   "strings" : {
     "Abbrechen" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Cancel" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        }
       }
     },
     "Aktiv" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Active" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Active"
+          }
+        }
       }
     },
     "Älter als 1 Monat löschen" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete older than 1 month" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete older than 1 month"
+          }
+        }
       }
     },
     "Älter als 1 Tag löschen" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete older than 1 day" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete older than 1 day"
+          }
+        }
       }
     },
     "Älter als 1 Woche löschen" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete older than 1 week" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete older than 1 week"
+          }
+        }
       }
     },
     "Älter als 3 Tage löschen" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete older than 3 days" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete older than 3 days"
+          }
+        }
       }
+    },
+    "Apple Music" : {
+
     },
     "Bearbeiten beenden" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Done editing" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done editing"
+          }
+        }
       }
     },
     "Bereit" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Ready" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready"
+          }
+        }
       }
     },
     "Eintrag löschen" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete entry" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete entry"
+          }
+        }
       }
     },
     "Fehler: Audio-Session nicht verfügbar" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Error: audio session unavailable" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: audio session unavailable"
+          }
+        }
       }
     },
     "Fehler: Stream nicht abspielbar" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Error: stream cannot be played" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error: stream cannot be played"
+          }
+        }
       }
     },
     "Gesamten Verlauf löschen" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Clear entire history" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear entire history"
+          }
+        }
       }
     },
     "Gestoppt" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Stopped" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stopped"
+          }
+        }
       }
     },
     "Keine gültigen Sender gefunden." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "No valid stations found." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No valid stations found."
+          }
+        }
       }
     },
     "Keine Sender" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "No stations" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No stations"
+          }
+        }
       }
     },
     "Lade ..." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Loading ..." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading ..."
+          }
+        }
       }
     },
     "Löschen" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Delete" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        }
       }
     },
     "Name" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Name" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
+          }
+        }
       }
     },
     "Noch kein Verlauf" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "No history yet" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No history yet"
+          }
+        }
       }
+    },
+    "OK" : {
+
     },
     "Pausiert" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Paused" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paused"
+          }
+        }
       }
     },
     "Puffert ..." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Buffering ..." } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buffering ..."
+          }
+        }
       }
     },
     "Sender" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Station" } }
-      }
-    },
-    "Sender anlegen" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Add station" } }
-      }
-    },
-    "Sender auswählen" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose a station" } }
-      }
-    },
-    "Sender bearbeiten" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Edit station" } }
-      }
-    },
-    "Sender exportieren" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Export stations" } }
-      }
-    },
-    "Sender importieren" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Import stations" } }
-      }
-    },
-    "Senderliste" : {
-      "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Stations" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Station"
+          }
+        }
       }
     },
     "SENDER" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "STATIONS" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "STATIONS"
+          }
+        }
+      }
+    },
+    "Sender anlegen" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add station"
+          }
+        }
+      }
+    },
+    "Sender auswählen" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a station"
+          }
+        }
+      }
+    },
+    "Sender bearbeiten" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit station"
+          }
+        }
+      }
+    },
+    "Sender deaktiviert" : {
+
+    },
+    "Sender exportieren" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export stations"
+          }
+        }
+      }
+    },
+    "Sender importieren" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import stations"
+          }
+        }
+      }
+    },
+    "Senderliste" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stations"
+          }
+        }
       }
     },
     "Sichern" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Save" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        }
       }
+    },
+    "Spotify" : {
+
     },
     "Stream-URL" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Stream URL" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stream URL"
+          }
+        }
       }
     },
     "Ungültige URL" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Invalid URL" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid URL"
+          }
+        }
       }
     },
     "VERLAUF" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "HISTORY" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HISTORY"
+          }
+        }
       }
     },
     "Verlauf-Optionen" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "History options" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History options"
+          }
+        }
       }
     },
     "Wiedergabe" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Playing" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Playing"
+          }
+        }
       }
     },
     "Wiedergabe starten" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Play" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play"
+          }
+        }
       }
     },
     "Wiedergabe stoppen" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Stop" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop"
+          }
+        }
       }
+    },
+    " Music" : {
+
     }
   },
   "version" : "1.0"
