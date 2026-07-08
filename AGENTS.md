@@ -2,6 +2,11 @@
 
 Stand: 2026-06-25
 
+## Typ & Zweck
+- **Typ:** GUI-App
+- **Zweck:** Internetradio-App fürs iPhone (Sender, Playback, Now-Playing, Verlauf) — iOS-Ableger von „Mucke, Baby!".
+- **Plattform:** iOS
+
 ## Aktueller Status
 
 - Git-Repo unter `~/git/baby_mucke` ist initialisiert, Branch `main`.
