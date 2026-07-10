@@ -4,7 +4,7 @@
 
 ![Baby, Mucke!](icons/social-baby-mucke.png)
 
-A native iPhone internet-radio player (SwiftUI + AVPlayer) with a fixed "Black MIDI" look: tap a station to play instantly, see the live track title, keep a play history and look songs up on Apple Music or Spotify with one tap. It is the iPhone sibling of the macOS app [Mucke, Baby!](https://github.com/DanielMuellerIR/mucke_baby).
+A native iPhone internet-radio player (SwiftUI + AVPlayer) with a "Black MIDI" look: tap a station to play instantly, see the live track title, keep a play history and look songs up on Apple Music or Spotify with one tap. It is the iPhone sibling of the macOS app [Mucke, Baby!](https://github.com/DanielMuellerIR/mucke_baby).
 
 <p align="center"><img src="icons/screenshot-iphone-en.png" width="300" alt="Station list on the left, play history on the right, player bar at the bottom"></p>
 
@@ -15,10 +15,11 @@ A native iPhone internet-radio player (SwiftUI + AVPlayer) with a fixed "Black M
 - **Play history** with start/end time per track and station, newest at the bottom; delete entries by age (older than 1 day / 3 days / 1 week / 1 month) or clear all.
 - **One-tap Apple Music / Spotify** lookup for the selected track.
 - **Manage stations** — add, edit, delete, plus JSON import / export; ships with a curated starter list.
+- **Light and dark Black MIDI interface** — choose either appearance in Settings or follow the iPhone system appearance automatically.
 - Playlist resolution for `.pls` / `.m3u` / `.asx` / `.xspf`.
 - **UI in German and English** (follows the system language).
 
-> Playback uses Apple's AVFoundation, so it covers MP3/AAC and HLS streams. Unlike the VLCKit-based macOS app, some Ogg/Opus stations may not play.
+> Playback uses Apple's AVFoundation. MP3, AAC, Ogg/Opus and Ogg/Vorbis were successfully tested on a physical iPhone. Ogg streams currently lack live titles because they do not provide ICY metadata blocks.
 
 ## Build & run (CLI / headless-friendly)
 
@@ -36,10 +37,9 @@ xcrun simctl install booted "$(find ~/Library/Developer/Xcode/DerivedData -name 
 xcrun simctl launch booted de.babymucke.BabyMucke
 ```
 
-On a real iPhone (signed). The Apple **Team ID stays out of the repo** — it is read from a gitignored `.env`:
+On a real iPhone (signed). The Apple Team ID is configured in the Xcode project:
 
 ```bash
-cp .env.example .env                                  # then set DEVELOPMENT_TEAM=XXXXXXXXXX
 ./scripts/build-device.sh                             # builds, signs and installs via `xcrun devicectl`
 ```
 

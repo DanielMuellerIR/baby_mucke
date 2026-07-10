@@ -10,7 +10,7 @@ Stand: 2026-06-25
 ## Aktueller Status
 
 - Git-Repo unter `~/git/baby_mucke` ist initialisiert, Branch `main`.
-- Aktuelle App-Version: **0.1.12**.
+- Aktuelle App-Version: **0.1.14**.
 - iOS-Projekt `BabyMucke.xcodeproj` existiert und baut fuer den iOS-Simulator.
 - Build-Befehl: `./scripts/build-simulator.sh`.
 - Unit-Test-Target `BabyMuckeTests` (45 Tests: reine Logik plus Verlauf-Pruning
@@ -32,8 +32,8 @@ Stand: 2026-06-25
 - Kurzname / Ordner: `baby_mucke`
 - Plattform: iPhone, Hochformat zuerst.
 - Ursprung: iPhone-Ableger von `../mucke_baby` ("Mucke, Baby!").
-- Design: festes **Black MIDI**-Design, keine Theme-Auswahl.
-- Nicht im MVP: Aufnahmefunktion, Visualizer, Theme-System, Mac-Menueleistenmodus.
+- Design: feste **Black MIDI**-Designsprache, als helle und dunkle Darstellung.
+- Nicht im MVP: Aufnahmefunktion, Visualizer, weitere Themes, Mac-Menueleistenmodus.
 - Kern im MVP: Senderliste, Playback, Now-Playing, Verlauf, Apple-Music- und Spotify-Buttons.
 
 ## Grundannahmen
@@ -83,6 +83,7 @@ Stand nach On-Device-Test (2026-07-08, echtes iPhone):
 ## UI-Stand / UI-Plan
 
 - Kein sichtbarer App-Name in der iOS-App.
+- Einstellungen bieten Hell, Dunkel und Automatisch (folgt der iOS-Systemdarstellung).
 - Umgesetzt ist eine kompakte Black-MIDI-Oberflaeche, staerker an der Mac-App orientiert:
   - schmalere Senderliste links, breiterer Verlauf rechts, beide gleichzeitig sichtbar.
   - Sendernamen klein/normalgewichtig, keine grossen fetten Zeilen.
@@ -119,7 +120,7 @@ Stand nach On-Device-Test (2026-07-08, echtes iPhone):
 - `PlaylistResolver.swift` — aus Mac-App portieren.
 - `SongHistory.swift` — aus Mac-App portieren, ohne Aufnahme-/Export-Bezug.
 - `MusicLinks.swift` — Apple Music / Spotify Such-URLs.
-- `BlackMidiStyle.swift` — feste Palette, Fonts, Komponenten.
+- `BlackMidiStyle.swift` — adaptive Hell-/Dunkel-Palette, Fonts, Komponenten.
 - `ContentView.swift`, `StationListView.swift`, `HistoryView.swift`, `PlayerBar.swift`.
 
 ## Umsetzung in der naechsten Session

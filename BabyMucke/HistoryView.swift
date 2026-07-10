@@ -4,6 +4,7 @@ struct HistoryView: View {
     @Environment(\.openURL) private var openURL
     @EnvironmentObject private var radioPlayer: RadioPlayer
     @Binding var selectedEntryID: SongEntry.ID?
+    @State private var showingSettings = false
 
     // Merkt sich den zuletzt gesehenen juengsten Eintrag, um einen NEU
     // angehaengten Eintrag von Loeschungen/Selektionswechseln zu unterscheiden.
@@ -45,6 +46,9 @@ struct HistoryView: View {
             actionBar
         }
         .background(BlackMidiStyle.panelFill)
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
+        }
     }
 
     // Eintraege chronologisch: aeltester oben, neuester unten (wie in der Mac-App).
@@ -64,6 +68,15 @@ struct HistoryView: View {
                 .lineLimit(1)
 
             Spacer(minLength: 0)
+
+            Button {
+                showingSettings = true
+            } label: {
+                Image(systemName: "gearshape")
+                    .accessibilityLabel("Einstellungen")
+            }
+            .buttonStyle(CompactIconButtonStyle(tint: BlackMidiStyle.text))
+            .help("Einstellungen")
 
             // Verlauf-Loesch-Menue, oben rechts wie der Bearbeiten-Button der
             // Senderliste. Loescht nur Verlaufs-Eintraege (per Zeitstempel).

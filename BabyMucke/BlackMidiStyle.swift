@@ -1,23 +1,31 @@
 import SwiftUI
+import UIKit
 
-// Feste Black-MIDI-Palette. Die App hat bewusst kein Theme-System: Schwarz als
-// Grund, dazu Cyan, Pink, Gruen und Amber fuer klare Zustandsfarben.
+// Gemeinsame Black-MIDI-Palette fuer beide Darstellungen. Die dynamischen Farben
+// reagieren auf den von der App gesetzten ColorScheme; dadurch verwenden auch
+// Sheets und Systemdialoge dieselbe manuell gewaehlte oder automatische Optik.
 enum BlackMidiStyle {
-    static let background = Color(hex: "#05060A")
+    static let background = adaptive(dark: "#05060A", light: "#F7F4EC")
     // Leicht durchscheinender Panel-Grund: derselbe Hex-Wert wie `background`,
     // nur mit Deckkraft — nicht als zweites Literal pflegen.
-    static let panelFill = background.opacity(0.62)
-    static let surface = Color(hex: "#10131C")
-    static let surfaceRaised = Color(hex: "#161A26")
-    static let line = Color(hex: "#2D3347")
-    static let text = Color(hex: "#F3F7FF")
-    static let secondaryText = Color(hex: "#9AA6BF")
-    static let dimText = Color(hex: "#66708A")
-    static let cyan = Color(hex: "#36E6FF")
-    static let pink = Color(hex: "#FF4FD8")
-    static let green = Color(hex: "#8DFF5A")
-    static let amber = Color(hex: "#FFD166")
-    static let red = Color(hex: "#FF5A6A")
+    static let panelFill = background.opacity(0.76)
+    static let surface = adaptive(dark: "#10131C", light: "#EEEAE0")
+    static let surfaceRaised = adaptive(dark: "#161A26", light: "#FFFFFF")
+    static let line = adaptive(dark: "#2D3347", light: "#C8C3B8")
+    static let text = adaptive(dark: "#F3F7FF", light: "#151822")
+    static let secondaryText = adaptive(dark: "#9AA6BF", light: "#596274")
+    static let dimText = adaptive(dark: "#66708A", light: "#8D94A1")
+    static let cyan = adaptive(dark: "#36E6FF", light: "#007B8F")
+    static let pink = adaptive(dark: "#FF4FD8", light: "#A61E72")
+    static let green = adaptive(dark: "#8DFF5A", light: "#287A22")
+    static let amber = adaptive(dark: "#FFD166", light: "#986100")
+    static let red = adaptive(dark: "#FF5A6A", light: "#BA2737")
+
+    private static func adaptive(dark: String, light: String) -> Color {
+        Color(uiColor: UIColor { traits in
+            UIColor(Color(hex: traits.userInterfaceStyle == .dark ? dark : light))
+        })
+    }
 }
 
 extension Color {
@@ -71,6 +79,8 @@ struct CompactIconButtonStyle: ButtonStyle {
 }
 
 struct BlackMidiBackdrop: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     var body: some View {
         // Die Cyber-Textur (1280x800, Querformat) hat ihre hellen Details im oberen
         // Drittel. Im Hochformat zeigte ein einfaches scaledToFill darum nur oben
@@ -78,20 +88,29 @@ struct BlackMidiBackdrop: View {
         // stapeln — obere Haelfte normal, untere Haelfte vertikal gespiegelt. So
         // rahmt die helle Struktur den Inhalt oben UND unten ("rundum"), die ruhige
         // dunkle Mitte haelt die Listentexte gut lesbar.
-        GeometryReader { geo in
-            VStack(spacing: 0) {
-                texture
-                    .frame(width: geo.size.width, height: geo.size.height / 2)
-                    .clipped()
-                texture
-                    .frame(width: geo.size.width, height: geo.size.height / 2)
-                    .clipped()
-                    .scaleEffect(y: -1)   // untere Haelfte vertikal spiegeln
+        ZStack {
+            BlackMidiStyle.background
+
+            GeometryReader { geo in
+                VStack(spacing: 0) {
+                    texture
+                        .frame(width: geo.size.width, height: geo.size.height / 2)
+                        .clipped()
+                    texture
+                        .frame(width: geo.size.width, height: geo.size.height / 2)
+                        .clipped()
+                        .scaleEffect(y: -1)   // untere Haelfte vertikal spiegeln
+                }
             }
-        }
-        .background(BlackMidiStyle.background)
-        .overlay {
-            BlackMidiStyle.background.opacity(0.28)   // dezenter Scrim, Textur bleibt sichtbar
+
+            if colorScheme == .dark {
+                BlackMidiStyle.background.opacity(0.28)
+            } else {
+                // Im Light Mode wird dieselbe Textur zur feinen grauen Papier-
+                // struktur. Eine hohe Deckkraft wuerde die Lesbarkeit mindern.
+                BlackMidiStyle.background.opacity(0.84)
+                    .blendMode(.screen)
+            }
         }
         .clipped()
     }

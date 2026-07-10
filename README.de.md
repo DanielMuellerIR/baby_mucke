@@ -15,10 +15,11 @@ Ein nativer iPhone-Internetradio-Player (SwiftUI + AVPlayer): Sender antippen un
 - **Verlauf** mit Start-/Endzeit je Titel und Sender, neueste Einträge unten; Einträge nach Alter löschen (älter als 1 Tag / 3 Tage / 1 Woche / 1 Monat) oder alles.
 - **Ein-Tipp-Suche** für den ausgewählten Titel bei Apple Music / Spotify.
 - **Sender verwalten** — anlegen, bearbeiten, löschen, plus JSON-Import / -Export; eine kuratierte Startliste ist enthalten.
+- **Helle und dunkle Black-MIDI-Oberfläche** — in den Einstellungen fest wählbar oder automatisch passend zur iPhone-Systemdarstellung.
 - Playlist-Auflösung für `.pls` / `.m3u` / `.asx` / `.xspf`.
 - **Oberfläche auf Deutsch und Englisch** (folgt der Systemsprache).
 
-> Die Wiedergabe nutzt Apples AVFoundation und deckt damit MP3-/AAC- und HLS-Streams ab. Anders als die VLCKit-basierte macOS-App spielen manche Ogg/Opus-Sender möglicherweise nicht.
+> Die Wiedergabe nutzt Apples AVFoundation. Auf einem echten iPhone wurden MP3, AAC, Ogg/Opus und Ogg/Vorbis erfolgreich getestet. Bei Ogg-Streams fehlt derzeit der Live-Titel, weil dieser nicht als ICY-Metadatenblock geliefert wird.
 
 ## Bauen & starten (Kommandozeile / headless-tauglich)
 
@@ -36,10 +37,9 @@ xcrun simctl install booted "$(find ~/Library/Developer/Xcode/DerivedData -name 
 xcrun simctl launch booted de.babymucke.BabyMucke
 ```
 
-Auf einem echten iPhone (signiert). Die Apple-**Team-ID bleibt aus dem Repo** — sie wird aus einer gitignorierten `.env` gelesen:
+Auf einem echten iPhone (signiert). Die Apple-Team-ID ist im Xcode-Projekt hinterlegt:
 
 ```bash
-cp .env.example .env                                  # dann DEVELOPMENT_TEAM=XXXXXXXXXX setzen
 ./scripts/build-device.sh                             # baut, signiert und installiert per `xcrun devicectl`
 ```
 
