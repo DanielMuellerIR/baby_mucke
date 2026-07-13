@@ -162,3 +162,17 @@ Stand nach On-Device-Test (2026-07-08, echtes iPhone):
 - iCloud-Sync zwischen Mac und iPhone.
 - Radio-browser-Suche, falls der MVP stabil ist.
 - App-Store-Metadaten, Icon-Feinschliff, TestFlight.
+
+## Verzeichnisstruktur
+
+<!-- directory-structure: generated -->
+- [AGENTS.md](AGENTS.md) — Projektprofil, Arbeitsregeln und dieses Datei-Verzeichnis.
+- [README.de.md](README.de.md) — Projekt-Einstieg und Nutzerdokumentation.
+- [README.md](README.md) — Projekt-Einstieg und Nutzerdokumentation.
+- `BabyMucke/` — Projektbestandteil; Details stehen im Code bzw. in der verlinkten Dokumentation.
+- `BabyMucke.xcodeproj/` — Projektbestandteil; Details stehen im Code bzw. in der verlinkten Dokumentation.
+- `BabyMuckeTests/` — Projektbestandteil; Details stehen im Code bzw. in der verlinkten Dokumentation.
+- `icons/` — Projektbestandteil; Details stehen im Code bzw. in der verlinkten Dokumentation.
+- `screenshots/` — Projektbestandteil; Details stehen im Code bzw. in der verlinkten Dokumentation.
+- `scripts/` — Projektbestandteil; Details stehen im Code bzw. in der verlinkten Dokumentation.
+<!-- /directory-structure -->
