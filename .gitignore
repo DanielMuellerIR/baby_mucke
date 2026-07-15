@@ -10,3 +10,6 @@ xcuserdata/
 
 # Lokale Build-Variablen mit Team-ID o. Ae. — nie einchecken (Repo kann public werden).
 .env
+
+# Generierte Programmier-Statistik (regenerierbar, nicht versionieren).
+STATS.md
