@@ -17,16 +17,22 @@ enum PlaylistResolver {
     }
 
     static func needsResolution(_ url: URL) -> Bool {
-        let s = url.absoluteString.lowercased()
+        // Nur den URL-Pfad pruefen, nicht Query oder Fragment: eine direkte
+        // Stream-URL wie "https://x.com/stream.mp3?file=.pls" ist keine
+        // Playlist, nur weil ".pls" in einem Query-Parameter auftaucht.
+        // Nebeneffekt: Ein "-pls?"-Sonderfall ist nicht mehr noetig, weil der
+        // Pfad nie ein "?" enthaelt — ein Query direkt nach "-pls" landet im
+        // hasSuffix-Fall.
+        let s = url.path.lowercased()
         if s.contains(".m3u8") { return false }
         // "-pls" am Ende eines Pfadsegments faengt TuneIn-Endpunkte wie
         // ".../tunein-aac-hd-pls" ab, die eine PLS-Playlist liefern, aber weder auf
         // ".pls" noch "/pls" enden. Bewusst grenzgebunden, damit eine direkte
-        // Stream-URL wie "https://my-pls-cdn.example/stream.mp3" nicht faelschlich
+        // Stream-URL wie "https://x.example/my-pls-stream.mp3" nicht faelschlich
         // als Playlist behandelt wird.
         return s.contains(".pls") || s.contains(".m3u") || s.contains(".asx")
             || s.contains(".xspf") || s.contains("tune.ashx") || s.contains("/pls")
-            || s.hasSuffix("-pls") || s.contains("-pls?") || s.contains("-pls/")
+            || s.hasSuffix("-pls") || s.contains("-pls/")
     }
 
     // Nur den Kopf der Datei laden: Falls die Heuristik irrt und die URL schon

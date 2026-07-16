@@ -17,9 +17,27 @@ final class PlaylistResolverTests: XCTestCase {
     }
 
     // Regressions-Guard: TuneIn-Endpunkt mit Endung "-pls" (gebuendelter
-    // Sender HardBase.FM) muss als aufzuloesende Playlist erkannt werden.
+    // Sender HardBase.FM) muss als aufzuloesende Playlist erkannt werden —
+    // auch mit angehaengtem Query (der Pfad endet dann weiterhin auf "-pls").
     func testNeedsResolutionForDashPlsEndpoint() {
         XCTAssertTrue(PlaylistResolver.needsResolution(URL(string: "http://listen.hardbase.fm/tunein-aac-hd-pls")!))
+        XCTAssertTrue(PlaylistResolver.needsResolution(URL(string: "http://listen.hardbase.fm/tunein-aac-hd-pls?ref=app")!))
+    }
+
+    // Regressions-Guard: Playlist-Endung im Pfad bleibt auch dann erkannt,
+    // wenn die URL zusaetzlich einen Query-Teil hat (Shoutcast-Muster).
+    func testNeedsResolutionForPlaylistPathWithQuery() {
+        XCTAssertTrue(PlaylistResolver.needsResolution(URL(string: "http://host:8000/listen.pls?sid=1")!))
+    }
+
+    // Regressions-Guard (Review-Fund F7): Playlist-Endungen zaehlen nur im
+    // URL-Pfad. Eine direkte Stream-URL, bei der ".pls"/".m3u"/".asx" nur im
+    // Query oder Fragment auftaucht, ist KEINE Playlist und darf keinen
+    // unnoetigen Aufloesungs-Request ausloesen.
+    func testNoResolutionForPlaylistMarkersInQueryOrFragment() {
+        XCTAssertFalse(PlaylistResolver.needsResolution(URL(string: "https://x.com/stream.mp3?file=.pls")!))
+        XCTAssertFalse(PlaylistResolver.needsResolution(URL(string: "https://x.com/stream.aac?playlist=.m3u")!))
+        XCTAssertFalse(PlaylistResolver.needsResolution(URL(string: "https://x.com/stream.mp3#.asx")!))
     }
 
     func testNoResolutionForDirectStreamsAndHLS() {
