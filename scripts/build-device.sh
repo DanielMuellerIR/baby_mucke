@@ -3,8 +3,8 @@ set -euo pipefail
 
 # Baut die iOS-App signiert fuer ein angeschlossenes iPhone und installiert sie.
 #
-# Die Team-ID landet bewusst NICHT im Repo (kann oeffentlich/App Store werden).
-# Sie kommt aus der Umgebung oder aus einer gitignored `.env` (siehe .env.example):
+# Die im Xcode-Projekt hinterlegte Team-ID ist der Standard. DEVELOPMENT_TEAM
+# aus der Umgebung oder einer gitignored `.env` ist nur ein optionales Override:
 #
 #   DEVELOPMENT_TEAM=XXXXXXXXXX ./scripts/build-device.sh
 #   # oder: Wert in .env eintragen, dann einfach:
@@ -26,23 +26,24 @@ if [[ -z "${DEVELOPMENT_TEAM:-}" && -f .env ]]; then
   set +a
 fi
 
-if [[ -z "${DEVELOPMENT_TEAM:-}" ]]; then
-  echo "Fehler: DEVELOPMENT_TEAM ist nicht gesetzt." >&2
-  echo "  -> In .env eintragen (Vorlage: .env.example) oder als Variable uebergeben." >&2
-  exit 1
+DERIVED="build/device"
+XCODE_ARGS=(
+  -project BabyMucke.xcodeproj
+  -scheme BabyMucke
+  -configuration Debug
+  -destination 'generic/platform=iOS'
+  -derivedDataPath "$DERIVED"
+  -allowProvisioningUpdates
+)
+if [[ -n "${DEVELOPMENT_TEAM:-}" ]]; then
+  XCODE_ARGS+=("DEVELOPMENT_TEAM=$DEVELOPMENT_TEAM")
+  echo "==> Baue + signiere fuer iOS-Geraet (Team-Override $DEVELOPMENT_TEAM) ..."
+else
+  echo "==> Baue + signiere fuer iOS-Geraet (Team aus Xcode-Projekt) ..."
 fi
 
-DERIVED="build/device"
-
-echo "==> Baue + signiere fuer iOS-Geraet (Team $DEVELOPMENT_TEAM) ..."
 xcodebuild \
-  -project BabyMucke.xcodeproj \
-  -scheme BabyMucke \
-  -configuration Debug \
-  -destination 'generic/platform=iOS' \
-  -derivedDataPath "$DERIVED" \
-  -allowProvisioningUpdates \
-  DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" \
+  "${XCODE_ARGS[@]}" \
   CODE_SIGN_STYLE=Automatic \
   build
 

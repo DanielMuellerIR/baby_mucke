@@ -10,10 +10,10 @@ Stand: 2026-06-25
 ## Aktueller Status
 
 - Git-Repo unter `~/git/baby_mucke` ist initialisiert, Branch `main`.
-- Aktuelle App-Version: **0.1.15**.
+- Aktuelle App-Version: **0.1.16**.
 - iOS-Projekt `BabyMucke.xcodeproj` existiert und baut fuer den iOS-Simulator.
 - Build-Befehl: `./scripts/build-simulator.sh`.
-- Unit-Test-Target `BabyMuckeTests` (47 Tests: reine Logik plus Verlauf-Pruning
+- Unit-Test-Target `BabyMuckeTests` (52 Tests: reine Logik plus Verlauf-Pruning
   und Sender-Store ueber injizierbaren Ordner) vorhanden;
   Lauf: `./scripts/run-tests.sh` (waehlt Simulator automatisch).
 - Audio-Engine fuer den MVP: **AVPlayer zuerst**.

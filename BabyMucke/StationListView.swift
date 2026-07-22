@@ -170,7 +170,7 @@ struct StationListView: View {
         do {
             let url = try result.get()
             try stationStore.importStations(fromFile: url)
-            selectDefaultStationAfterListChange()
+            StationListSynchronizer.synchronize(store: stationStore, player: radioPlayer)
         } catch {
             alertMessage = error.localizedDescription
         }
@@ -179,7 +179,7 @@ struct StationListView: View {
     private func saveDraft(_ draft: StationDraft) {
         let station = draft.station()
         stationStore.upsert(station)
-        radioPlayer.refreshCurrentStation(station)
+        StationListSynchronizer.synchronize(store: stationStore, player: radioPlayer)
     }
 
     private func deleteDraft(_ draft: StationDraft) {
@@ -187,18 +187,8 @@ struct StationListView: View {
               let station = stationStore.stations.first(where: { $0.id == id })
         else { return }
 
-        let deletesCurrentStation = radioPlayer.currentStation?.id == station.id
         stationStore.delete(station)
-        if deletesCurrentStation {
-            radioPlayer.stop()
-            selectDefaultStationAfterListChange()
-        }
-    }
-
-    private func selectDefaultStationAfterListChange() {
-        if let station = stationStore.defaultStation {
-            radioPlayer.select(station)
-        }
+        StationListSynchronizer.synchronize(store: stationStore, player: radioPlayer)
     }
 }
 

@@ -11,12 +11,13 @@ final class StationStore: ObservableObject {
     let dir: URL
     let stationsURL: URL
 
-    private let defaults = UserDefaults.standard
+    private let defaults: UserDefaults
     private let lastPlayedKey = "lastPlayedStationID"
 
     // `directory` ist standardmaessig der App-Support-Ordner und wird nur fuer
     // Tests injiziert, damit diese nicht auf der gemeinsamen stations.json arbeiten.
-    init(directory: URL? = nil) {
+    init(directory: URL? = nil, defaults: UserDefaults = .standard) {
+        self.defaults = defaults
         let base = directory ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         dir = base.appendingPathComponent("BabyMucke", isDirectory: true)
         stationsURL = dir.appendingPathComponent("stations.json")
@@ -42,10 +43,10 @@ final class StationStore: ObservableObject {
     }
 
     // Der Sender, mit dem die Wiedergabe starten soll, wenn gerade keiner aktiv
-    // ist: zuletzt gespielt, sonst Favorit, sonst der erste der Wiedergabeliste.
-    // Zentral hier, damit ContentView und StationListView dieselbe Wahl treffen.
+    // ist: zuletzt gespielt, sonst der erste der aktivierten Wiedergabeliste.
+    // Zentral hier, damit alle Auswahl- und Play-Einstiegspfade dieselbe Wahl treffen.
     var defaultStation: Station? {
-        lastPlayed ?? favorite ?? stationsForPlaybackList.first
+        lastPlayed ?? stationsForPlaybackList.first
     }
 
     // Reihenfolge fuer die Hauptliste: Favorit, zuletzt gespielt, danach alle

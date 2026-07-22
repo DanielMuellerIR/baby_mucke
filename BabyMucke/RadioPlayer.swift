@@ -160,6 +160,18 @@ final class RadioPlayer: ObservableObject {
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 
+    // Listenimport/-loeschung braucht einen staerkeren Vertrag als der normale
+    // Stop-Button: Ein nicht mehr vorhandener oder deaktivierter Sender darf weder
+    // angezeigt noch ueber PlayerBar/Remote Controls erneut gestartet werden.
+    func stopAndClearSelection() {
+        stop()
+        playGeneration &+= 1
+        currentStation = nil
+        nowPlayingTitle = ""
+        setStatus("Bereit")
+        refreshNowPlayingCenter()
+    }
+
     private func start(url: URL) {
         guard activateAudioSession() else { return }
 
@@ -359,6 +371,43 @@ final class RadioPlayer: ObservableObject {
             info[MPMediaItemPropertyArtist] = split.artist ?? station.name
         }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+    }
+}
+
+// Kleine Player-Grenze fuer die deterministisch testbare Synchronisation nach
+// Senderlisten-Aenderungen. Der echte RadioPlayer und Tests mit einem Fake teilen
+// denselben Vertrag; dabei wird kein Stream geoeffnet.
+@MainActor
+protocol StationListPlayback: AnyObject {
+    var currentStation: Station? { get }
+    func select(_ station: Station)
+    func refreshCurrentStation(_ station: Station)
+    func stopAndClearSelection()
+}
+
+extension RadioPlayer: StationListPlayback {}
+
+@MainActor
+enum StationListSynchronizer {
+    static func synchronize<Player: StationListPlayback>(store: StationStore, player: Player) {
+        guard let current = player.currentStation else {
+            if let fallback = store.defaultStation {
+                player.select(fallback)
+            }
+            return
+        }
+
+        if let retained = store.stations.first(where: { $0.id == current.id && $0.enabled }) {
+            // Auch Name/URL aus einem Import uebernehmen. RadioPlayer startet bei
+            // geaenderter URL einen laufenden Sender kontrolliert neu.
+            player.refreshCurrentStation(retained)
+            return
+        }
+
+        player.stopAndClearSelection()
+        if let fallback = store.defaultStation {
+            player.select(fallback)
+        }
     }
 }
 

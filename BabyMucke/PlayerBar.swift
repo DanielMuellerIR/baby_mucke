@@ -85,8 +85,7 @@ struct PlayerBar: View {
             radioPlayer.stop()
             return
         }
-        let station = radioPlayer.currentStation ?? stationStore.favorite ?? stationStore.lastPlayed
-            ?? stationStore.stationsForPlaybackList.first
+        let station = radioPlayer.currentStation ?? stationStore.defaultStation
         guard let station else { return }
         stationStore.markPlayed(station)
         radioPlayer.play(station)
