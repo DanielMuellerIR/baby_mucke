@@ -139,6 +139,16 @@ Stand nach On-Device-Test (2026-07-08, echtes iPhone):
    ohne Query. MUSS mit echtem Spotify-Account bzw. installierter Spotify-App verifiziert
    werden. Falls es auch dann leer bleibt: `spotify:search:<query>`-URI (App) bzw. eine
    Query-Param-Variante testen. (Stand 2026-07-08, on-device beobachtet.)
+6. `SongHistory.swift` (`SongEntry`, Zeile 5–23): Tolerantes `id`-Decoding analog
+   `Station` (`Models.swift:24`) nachruesten. Fehlt `id` in einer handeditierten
+   `verlauf.json`, schlaegt der Decode fehl und das `try?` in `load()` verwirft den
+   GESAMTEN Verlauf. Eigenen `init(from:)` mit Default-UUID
+   (`(try? c.decode(UUID.self, forKey: .id)) ?? UUID()`). (Quelle: Code-Review-Triage 2026-07-24)
+7. `RadioPlayer.swift` (`refreshCurrentStation`, Zeile 60–85): Der `!station.enabled`-Zweig
+   (Zeile 67–72) ist im Produktionspfad unerreichbar — der einzige Aufrufer
+   `synchronize` filtert bereits auf `&& $0.enabled` (`RadioPlayer.swift:400`), und
+   die Deaktivierung laeuft ueber `stopAndClearSelection`. Zweig entfernen oder den
+   Kommentar korrigieren. (Quelle: Code-Review-Triage 2026-07-24)
 
 ## Fallen / Agent-Hinweise
 
