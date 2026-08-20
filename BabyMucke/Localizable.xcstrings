@@ -21,36 +21,6 @@
         }
       }
     },
-    "Automatisch" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Automatic"
-          }
-        }
-      }
-    },
-    "Automatisch folgt der Systemeinstellung des iPhones." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Automatic follows your iPhone's system appearance."
-          }
-        }
-      }
-    },
-    "Bitte eine gültige HTTP- oder HTTPS-URL eingeben." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Please enter a valid HTTP or HTTPS URL."
-          }
-        }
-      }
-    },
     "Älter als 1 Monat löschen" : {
       "localizations" : {
         "en" : {
@@ -94,6 +64,26 @@
     "Apple Music" : {
 
     },
+    "Automatisch" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic"
+          }
+        }
+      }
+    },
+    "Automatisch folgt der Systemeinstellung des iPhones." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic follows your iPhone's system appearance."
+          }
+        }
+      }
+    },
     "Bearbeiten beenden" : {
       "localizations" : {
         "en" : {
@@ -110,6 +100,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ready"
+          }
+        }
+      }
+    },
+    "Bitte eine gültige HTTP- oder HTTPS-URL eingeben." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please enter a valid HTTP or HTTPS URL."
           }
         }
       }
@@ -413,6 +413,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Stations"
+          }
+        }
+      }
+    },
+    "Senderliste importieren" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import stations"
           }
         }
       }
