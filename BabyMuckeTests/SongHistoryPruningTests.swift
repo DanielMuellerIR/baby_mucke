@@ -10,11 +10,46 @@ final class SongHistoryPruningTests: XCTestCase {
 
     // Fester Zeitanker, damit die Dauer-Schwellen deterministisch sind.
     private let t0 = Date(timeIntervalSince1970: 1_700_000_000)
+    private var tempDirs: [URL] = []
 
-    private func freshHistory() -> SongHistory {
+    override func tearDown() {
+        super.tearDown()
+        for url in tempDirs {
+            try? FileManager.default.removeItem(at: url)
+        }
+        tempDirs.removeAll()
+    }
+
+    private func freshHistory(in directory: URL? = nil) -> SongHistory {
+        let dir = directory ?? {
+            let d = FileManager.default.temporaryDirectory
+                .appendingPathComponent("bm-test-\(UUID().uuidString)", isDirectory: true)
+            tempDirs.append(d)
+            return d
+        }()
+        return SongHistory(directory: dir)
+    }
+
+    func testSaveAndLoadRoundtrip() {
         let dir = FileManager.default.temporaryDirectory
             .appendingPathComponent("bm-test-\(UUID().uuidString)", isDirectory: true)
-        return SongHistory(directory: dir)
+        tempDirs.append(dir)
+
+        let h1 = SongHistory(directory: dir)
+        h1.note(station: "S1", raw: "Artist1 - Title1", at: t0)
+        h1.note(station: "S2", raw: "Artist2 - Title2", at: t0.addingTimeInterval(30))
+        h1.closeCurrent(at: t0.addingTimeInterval(60))
+
+        let h2 = SongHistory(directory: dir)
+        XCTAssertEqual(h2.entries.count, 2)
+        XCTAssertEqual(h2.entries[0].station, "S1")
+        XCTAssertEqual(h2.entries[0].raw, "Artist1 - Title1")
+        XCTAssertEqual(h2.entries[0].artist, "Artist1")
+        XCTAssertEqual(h2.entries[0].title, "Title1")
+        XCTAssertEqual(h2.entries[1].station, "S2")
+        XCTAssertEqual(h2.entries[1].raw, "Artist2 - Title2")
+        XCTAssertEqual(h2.entries[1].artist, "Artist2")
+        XCTAssertEqual(h2.entries[1].title, "Title2")
     }
 
     func testNoteAddsOpenEntryAndSplits() {

@@ -23,6 +23,7 @@ final class ICYMetadataReader: NSObject, URLSessionDataDelegate {
     }()
 
     // Parser-Zustand. Nur auf delegateQueue gelesen/geschrieben (siehe oben).
+    private var currentTask: URLSessionDataTask?
     private var metaint = 0
     private var skip = 0
     private var inMeta = false
@@ -60,6 +61,7 @@ final class ICYMetadataReader: NSObject, URLSessionDataDelegate {
                     completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         // Frischer Stream: Parser-Zustand hier auf der Delegate-Queue zuruecksetzen
         // (statt im main-seitigen stop()), damit kein Datenrennen entsteht.
+        currentTask = dataTask
         metaint = 0
         skip = 0
         inMeta = false
@@ -79,7 +81,7 @@ final class ICYMetadataReader: NSObject, URLSessionDataDelegate {
     }
 
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        guard metaint > 0 else { return }
+        guard dataTask === currentTask, metaint > 0 else { return }
         for b in data {
             if !inMeta {
                 if skip > 0 {
@@ -102,6 +104,17 @@ final class ICYMetadataReader: NSObject, URLSessionDataDelegate {
                     skip = metaint
                 }
             }
+        }
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        metaint = 0
+        skip = 0
+        inMeta = false
+        metaLeft = 0
+        buf.removeAll(keepingCapacity: false)
+        if task === currentTask {
+            currentTask = nil
         }
     }
 
@@ -138,7 +151,7 @@ final class ICYMetadataReader: NSObject, URLSessionDataDelegate {
            sj.unicodeScalars.contains(where: { isJapaneseScalar($0.value) }) {
             return sj
         }
-        return String(data: data, encoding: .isoLatin1) ?? String(decoding: bytes, as: UTF8.self)
+        return String(data: data, encoding: .isoLatin1) ?? ""
     }
 
     private func looksLikeWindows1251(_ bytes: [UInt8]) -> Bool {

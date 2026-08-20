@@ -35,9 +35,12 @@ final class StationDecodingTests: XCTestCase {
     }
 
     func testStationGetsFreshIDWhenMissing() throws {
-        // Ohne id wird eine frische UUID vergeben (also nicht die Null-UUID).
-        let s = try decodeStations(#"[{"name":"X","url":"u"}]"#)[0]
-        XCTAssertNotEqual(s.id, UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+        // Ohne id wird je Eintrag eine frische, eindeutige UUID vergeben.
+        let list = try decodeStations(#"[{"name":"X","url":"u1"},{"name":"Y","url":"u2"}]"#)
+        XCTAssertEqual(list.count, 2)
+        XCTAssertNotEqual(list[0].id, UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+        XCTAssertNotEqual(list[1].id, UUID(uuidString: "00000000-0000-0000-0000-000000000000"))
+        XCTAssertNotEqual(list[0].id, list[1].id)
     }
 
     func testSeedStationDefaultsAndToStation() throws {

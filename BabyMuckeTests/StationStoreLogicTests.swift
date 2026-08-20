@@ -29,9 +29,21 @@ final class StationStoreLogicTests: XCTestCase {
         }
     }
 
+    private var tempDirs: [URL] = []
+
+    override func tearDown() {
+        super.tearDown()
+        for url in tempDirs {
+            try? FileManager.default.removeItem(at: url)
+        }
+        tempDirs.removeAll()
+    }
+
     private func tempBase() -> URL {
-        FileManager.default.temporaryDirectory
+        let dir = FileManager.default.temporaryDirectory
             .appendingPathComponent("bm-store-\(UUID().uuidString)", isDirectory: true)
+        tempDirs.append(dir)
+        return dir
     }
 
     // Schreibt eine stations.json in den Unterordner, den StationStore.init erwartet.

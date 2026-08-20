@@ -37,8 +37,8 @@ struct PlayerBar: View {
                     }
                 }
 
-                if !subtitle.isEmpty {
-                    Text(subtitle)
+                if !radioPlayer.nowPlayingTitle.isEmpty {
+                    Text(radioPlayer.nowPlayingTitle)
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(BlackMidiStyle.amber)
                         .lineLimit(2)
@@ -66,11 +66,6 @@ struct PlayerBar: View {
                 .fill(BlackMidiStyle.line)
                 .frame(height: 1)
         }
-    }
-
-    private var subtitle: String {
-        if !radioPlayer.nowPlayingTitle.isEmpty { return radioPlayer.nowPlayingTitle }
-        return ""
     }
 
     private var statusColor: Color {

@@ -50,6 +50,12 @@ final class MusicLinksTests: XCTestCase {
         XCTAssertEqual(term, "Daft Punk Get Lucky")
     }
 
+    func testAppleMusicURLEncodesPlusSign() {
+        let e = entry(artist: "+44", title: "Baby Come On", raw: "+44 - Baby Come On")
+        let url = MusicLinks.appleMusicSearchURL(for: e)
+        XCTAssertTrue(url.absoluteString.contains("term=%2B44%20Baby%20Come%20On"))
+    }
+
     func testSpotifyURLPercentEncodesPath() {
         let e = entry(artist: "Daft Punk", title: "Get Lucky", raw: "Daft Punk - Get Lucky")
         let url = MusicLinks.spotifySearchURL(for: e)

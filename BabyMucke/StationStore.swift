@@ -71,10 +71,23 @@ final class StationStore: ObservableObject {
 
     // MARK: - Laden / Speichern
 
+    static let stationsEncoder: JSONEncoder = {
+        let enc = JSONEncoder()
+        enc.outputFormatting = [.prettyPrinted, .sortedKeys]
+        return enc
+    }()
+    static let stationsDecoder = JSONDecoder()
+
     func loadStations() {
-        if let data = try? Data(contentsOf: stationsURL),
-           let list = try? JSONDecoder().decode([Station].self, from: data),
-           !list.isEmpty {
+        guard FileManager.default.fileExists(atPath: stationsURL.path) else {
+            stations = seededStations()
+            saveStations()
+            return
+        }
+
+        do {
+            let data = try Data(contentsOf: stationsURL)
+            let list = try Self.stationsDecoder.decode([Station].self, from: data)
             // Fruehe Test-Builds haben eine kleine 4-Sender-Demoliste persistiert.
             // Diese unberuehrte Demoliste ersetzen wir durch den gebuendelten Default,
             // damit bestehende Beta-Installationen ebenfalls mit Daniels Senderliste starten.
@@ -85,17 +98,21 @@ final class StationStore: ObservableObject {
             } else {
                 stations = list
             }
-            return
+        } catch {
+            Self.log.error("stations.json konnte nicht geladen werden (\(error)), sichere Backup nach stations.json.bak")
+            let bakURL = dir.appendingPathComponent("stations.json.bak")
+            try? FileManager.default.removeItem(at: bakURL)
+            try? FileManager.default.copyItem(at: stationsURL, to: bakURL)
+            stations = seededStations()
         }
-        stations = seededStations()
-        saveStations()
     }
 
     func saveStations() {
-        let enc = JSONEncoder()
-        enc.outputFormatting = [.prettyPrinted, .sortedKeys]
-        if let data = try? enc.encode(stations) {
-            try? data.write(to: stationsURL, options: .atomic)
+        do {
+            let data = try Self.stationsEncoder.encode(stations)
+            try data.write(to: stationsURL, options: .atomic)
+        } catch {
+            Self.log.error("stations.json konnte nicht gespeichert werden: \(error)")
         }
     }
 
@@ -132,8 +149,17 @@ final class StationStore: ObservableObject {
         }
 
         let data = try Data(contentsOf: url)
-        let imported = try JSONDecoder().decode([Station].self, from: data)
-        stations = try normalizedStations(imported)
+        let imported = try Self.stationsDecoder.decode([Station].self, from: data)
+        let normalized = try normalizedStations(imported)
+
+        // Vor dem Überschreiben bisherige Datei als stations.backup.json sichern
+        if FileManager.default.fileExists(atPath: stationsURL.path) {
+            let backupURL = dir.appendingPathComponent("stations.backup.json")
+            try? FileManager.default.removeItem(at: backupURL)
+            try? FileManager.default.copyItem(at: stationsURL, to: backupURL)
+        }
+
+        stations = normalized
         saveStations()
     }
 
@@ -147,7 +173,7 @@ final class StationStore: ObservableObject {
         if let url = Bundle.main.url(forResource: "seed-stations", withExtension: "json") {
             do {
                 let data = try Data(contentsOf: url)
-                let seeds = try JSONDecoder().decode([SeedStation].self, from: data)
+                let seeds = try Self.stationsDecoder.decode([SeedStation].self, from: data)
                 if !seeds.isEmpty { return seeds.map { $0.toStation() } }
                 Self.log.warning("seed-stations.json ist leer — falle auf builtinDefaults zurueck")
             } catch {
@@ -169,7 +195,7 @@ final class StationStore: ObservableObject {
           {"name":"Deep House Radio","url":"http://62.210.105.16:7000/stream"}
         ]
         """
-        return (try? JSONDecoder().decode([SeedStation].self, from: Data(json.utf8))) ?? []
+        return (try? StationStore.stationsDecoder.decode([SeedStation].self, from: Data(json.utf8))) ?? []
     }()
 
     // codereview-ok: Vergleich ueber name UND url ist Absicht — sobald der Nutzer nur EINE der vier Demo-URLs (oder Namen) aendert, schlaegt allSatisfy fehl und die Liste bleibt unangetastet; es gibt keinen Datenverlust (2026-07-08)

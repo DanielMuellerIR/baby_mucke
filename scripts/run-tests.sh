@@ -24,10 +24,10 @@ if [[ -n "${IOS_SIM:-}" ]]; then
   fi
 else
   # UDID des ersten verfuegbaren iPhone-Simulators aus der ersten Klammer ziehen.
-  UDID="$(xcrun simctl list devices available \
+  UDID="$( (xcrun simctl list devices available \
     | grep -E '^[[:space:]]*iPhone' \
-    | head -1 \
-    | sed -E 's/.*\(([0-9A-Fa-f-]{36})\).*/\1/')"
+    | awk 'NR==1{print; exit}' \
+    | sed -E 's/.*\(([0-9A-Fa-f-]{36})\).*/\1/') || true )"
   if [[ -z "$UDID" ]]; then
     echo "Fehler: Kein verfuegbarer iPhone-Simulator gefunden." >&2
     echo "  -> In Xcode einen iPhone-Simulator installieren oder IOS_SIM=\"<UDID|Name>\" setzen." >&2

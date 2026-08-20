@@ -43,7 +43,13 @@ enum PlaylistResolver {
         req.setValue("BabyMucke/\(AppInfo.version)", forHTTPHeaderField: "User-Agent")
         req.timeoutInterval = 8
         do {
-            let (data, _) = try await URLSession.shared.data(for: req)
+            let (bytes, _) = try await URLSession.shared.bytes(for: req)
+            var data = Data()
+            data.reserveCapacity(65536)
+            for try await byte in bytes {
+                data.append(byte)
+                if data.count >= 65536 { break }
+            }
             return String(data: data, encoding: .utf8) ?? String(data: data, encoding: .isoLatin1)
         } catch {
             return nil

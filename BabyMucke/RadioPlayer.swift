@@ -1,4 +1,5 @@
 import AVFoundation
+import Combine
 import Foundation
 import MediaPlayer
 import os
@@ -20,7 +21,7 @@ final class RadioPlayer: ObservableObject {
 
     private var player: AVPlayer?
     private let icy = ICYMetadataReader()
-    // Monoton wachsender Zaehler: wird bei jedem play()-Aufruf erhoehen.
+    // Monoton wachsender Zaehler: wird bei jedem Abbau/Start erhoeht.
     // setNowPlaying verwirft Titel, deren Generation nicht mehr aktuell ist,
     // damit verspätete icy-Callbacks einer alten Session keinen Phantom-Eintrag
     // in den Verlauf schreiben oder den Titel dem falschen Sender zuordnen.
@@ -29,27 +30,16 @@ final class RadioPlayer: ObservableObject {
     private var itemStatusObservation: NSKeyValueObservation?
     private var timeControlObservation: NSKeyValueObservation?
     private var timeObserver: Any?
-    private var remoteCommandsConfigured = false
+    private var historyCancellable: AnyCancellable?
 
     init() {
         configureRemoteCommands()
-        history.pruneOnLaunchOrQuit()
+        historyCancellable = history.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
     }
 
     func select(_ station: Station) {
-        if currentStation?.id == station.id {
-            if currentStation != station {
-                currentStation = station
-                refreshNowPlayingCenter()
-            }
-            return
-        }
-
-        if isPlaying || isLoading {
-            play(station)
-            return
-        }
-
         currentStation = station
         nowPlayingTitle = ""
         playStartedAt = nil
@@ -102,15 +92,12 @@ final class RadioPlayer: ObservableObject {
         #if DEBUG
         PlayerDiagnostics.logMemory("play '\(station.name)'")
         #endif
-        history.closeCurrent()
-        resetPlaybackObjects()
+        teardownPlayback(closeHistory: true, clearSelection: false)
 
         currentStation = station
         nowPlayingTitle = ""
         setStatus("Lade ...")
         isLoading = true
-        isPlaying = false
-        playStartedAt = nil
         refreshNowPlayingCenter()
     }
 
@@ -126,7 +113,7 @@ final class RadioPlayer: ObservableObject {
             await MainActor.run {
                 // Erneuter Abbruch-Check IM MainActor-Block: Zwischen dem synchronen
                 // Setup in prepareForPlay und diesem Body kann ein stop()/play()
-                // dazwischenfunken, das via resetPlaybackObjects() diesen resolveTask
+                // dazwischenfunken, das via teardownPlayback() diesen resolveTask
                 // cancelt. Ohne den erneuten Check wuerde start() trotzdem einen neuen
                 // AVPlayer+ICY aufbauen und currentStation/isLoading/isPlaying ueberschreiben.
                 if Task.isCancelled { return }
@@ -146,16 +133,12 @@ final class RadioPlayer: ObservableObject {
         #if DEBUG
         PlayerDiagnostics.logMemory("stop")
         #endif
-        history.closeCurrent()
-        resetPlaybackObjects()
-        isPlaying = false
-        isLoading = false
-        playStartedAt = nil
+        teardownPlayback(closeHistory: true, clearSelection: false)
         setStatus("Gestoppt")
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
         // Audio-Session freigeben, damit andere Apps (Musik, Podcasts) nach dem
         // Stoppen wieder weiterlaufen koennen. Best-effort wie der Rest hier.
-        // Bewusst nur in stop(), nicht in resetPlaybackObjects() — letzteres laeuft
+        // Bewusst nur in stop(), nicht in teardownPlayback() — letzteres laeuft
         // auch beim Senderwechsel, wo direkt wieder aktiviert wird.
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
@@ -164,12 +147,13 @@ final class RadioPlayer: ObservableObject {
     // Stop-Button: Ein nicht mehr vorhandener oder deaktivierter Sender darf weder
     // angezeigt noch ueber PlayerBar/Remote Controls erneut gestartet werden.
     func stopAndClearSelection() {
-        stop()
-        playGeneration &+= 1
-        currentStation = nil
-        nowPlayingTitle = ""
+        #if DEBUG
+        PlayerDiagnostics.logMemory("stopAndClearSelection")
+        #endif
+        teardownPlayback(closeHistory: true, clearSelection: true)
         setStatus("Bereit")
         refreshNowPlayingCenter()
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 
     private func start(url: URL) {
@@ -193,10 +177,6 @@ final class RadioPlayer: ObservableObject {
         }
 
         player.play()
-        // Generation vor icy.start() erhoehen und im Callback einfangen.
-        // So werden verspätete Titel-Callbacks einer abgebrochenen Session
-        // sicher verworfen (Phantom-Verlauf-Bug-Schutz).
-        playGeneration &+= 1
         let capturedGeneration = playGeneration
         // codereview-ok: onTitle wird NICHT in ICYMetadataReader.stop() genullt — start() ruft stop() als erste Zeile, das wuerde den gerade gesetzten Callback sofort wieder loeschen; verspaetete Callbacks fangen wir stattdessen ueber capturedGeneration ab (2026-07-08)
         icy.onTitle = { [weak self] title in
@@ -235,12 +215,8 @@ final class RadioPlayer: ObservableObject {
         case .readyToPlay:
             if !isPlaying { setStatus("Puffert ...") }
         case .failed:
-            isPlaying = false
-            isLoading = false
-            playStartedAt = nil
+            teardownPlayback(closeHistory: true, clearSelection: false)
             setStatus("Fehler: Stream nicht abspielbar", isError: true)
-            history.closeCurrent()
-            icy.stop()
         case .unknown:
             break
         @unknown default:
@@ -262,10 +238,8 @@ final class RadioPlayer: ObservableObject {
             }
         case .paused:
             if isPlaying {
-                isPlaying = false
-                isLoading = false
+                teardownPlayback(closeHistory: true, clearSelection: false)
                 setStatus("Pausiert")
-                history.closeCurrent()
             }
         @unknown default:
             break
@@ -274,13 +248,13 @@ final class RadioPlayer: ObservableObject {
     }
 
     private func markPlaybackStarted() {
-        // codereview-ok: resetPlaybackObjects() setzt player=nil; ein alter/queued Callback faellt durch diesen Guard, kein Phantom-Write moeglich (2026-07-01)
+        // codereview-ok: teardownPlayback() setzt player=nil; ein alter/queued Callback faellt durch diesen Guard, kein Phantom-Write moeglich (2026-07-01)
         guard player?.timeControlStatus == .playing else { return }
         // Der periodische Time-Observer diente nur dazu, den Start der Wiedergabe
         // zuverlaessig zu erkennen (als Ergaenzung zur timeControlStatus-KVO).
         // Sobald sie laeuft, ist er ueberfluessig und wuerde sonst jede halbe
         // Sekunde setStatus()/refreshNowPlayingCenter() umsonst neu aufrufen.
-        // Deshalb hier einmalig entfernen (resetPlaybackObjects() nullt den Token
+        // Deshalb hier einmalig entfernen (teardownPlayback() nullt den Token
         // beim Senderwechsel, ein Doppel-Remove kann also nicht passieren).
         if let timeObserver {
             player?.removeTimeObserver(timeObserver)
@@ -310,7 +284,8 @@ final class RadioPlayer: ObservableObject {
         refreshNowPlayingCenter()
     }
 
-    private func resetPlaybackObjects() {
+    private func teardownPlayback(closeHistory: Bool = true, clearSelection: Bool = false) {
+        playGeneration &+= 1
         resolveTask?.cancel()
         resolveTask = nil
         icy.stop()
@@ -323,11 +298,20 @@ final class RadioPlayer: ObservableObject {
         player?.pause()
         player?.replaceCurrentItem(with: nil)
         player = nil
+
+        if closeHistory {
+            history.closeCurrent()
+        }
+        if clearSelection {
+            currentStation = nil
+            nowPlayingTitle = ""
+        }
+        isPlaying = false
+        isLoading = false
+        playStartedAt = nil
     }
 
     private func configureRemoteCommands() {
-        guard !remoteCommandsConfigured else { return }
-        remoteCommandsConfigured = true
         let center = MPRemoteCommandCenter.shared()
         center.playCommand.addTarget { [weak self] _ in
             Task { @MainActor in

@@ -8,6 +8,9 @@ struct StationListView: View {
     @State private var editMode = false
     @State private var showingImporter = false
     @State private var showingExporter = false
+    @State private var exportDocument: StationsJSONDocument?
+    @State private var pendingImportURL: URL?
+    @State private var showingImportConfirmation = false
     @State private var editingDraft: StationDraft?
     @State private var alertMessage: String?
 
@@ -39,11 +42,17 @@ struct StationListView: View {
         .background(BlackMidiStyle.panelFill)
         // codereview-ok: fileImporter/fileExporter haengen bewusst am dauerhaft gemounteten Haupt-View statt im editMode-Block — dort wuerden sie beim Verlassen des Bearbeiten-Modus abgebaut, waehrend der System-Dialog noch offen ist (2026-07-08)
         .fileImporter(isPresented: $showingImporter, allowedContentTypes: [.json]) { result in
-            handleImport(result)
+            switch result {
+            case .success(let url):
+                pendingImportURL = url
+                showingImportConfirmation = true
+            case .failure(let error):
+                alertMessage = error.localizedDescription
+            }
         }
         .fileExporter(
             isPresented: $showingExporter,
-            document: StationsJSONDocument(stations: stationStore.stations),
+            document: exportDocument,
             contentType: .json,
             defaultFilename: "stations.json"
         ) { result in
@@ -57,6 +66,19 @@ struct StationListView: View {
                 onSave: saveDraft,
                 onDelete: draft.isNew ? nil : deleteDraft
             )
+        }
+        .alert("Senderliste importieren", isPresented: $showingImportConfirmation) {
+            Button("Ersetzen", role: .destructive) {
+                if let url = pendingImportURL {
+                    executeImport(url)
+                }
+                pendingImportURL = nil
+            }
+            Button("Abbrechen", role: .cancel) {
+                pendingImportURL = nil
+            }
+        } message: {
+            Text("Möchtest du die Senderliste importieren? Die aktuelle Senderliste wird dabei ersetzt.")
         }
         // codereview-ok: "Senderliste" ist ein LocalizedStringKey und in Localizable.xcstrings uebersetzt — kein hardcodierter Text (2026-07-08)
         .alert("Senderliste", isPresented: alertIsPresented) {
@@ -130,6 +152,7 @@ struct StationListView: View {
                     .help("Sender importieren")
 
                     Button {
+                        exportDocument = StationsJSONDocument(stations: stationStore.stations)
                         showingExporter = true
                     } label: {
                         Image(systemName: "square.and.arrow.up")
@@ -166,9 +189,8 @@ struct StationListView: View {
         radioPlayer.play(station)
     }
 
-    private func handleImport(_ result: Result<URL, Error>) {
+    private func executeImport(_ url: URL) {
         do {
-            let url = try result.get()
             try stationStore.importStations(fromFile: url)
             StationListSynchronizer.synchronize(store: stationStore, player: radioPlayer)
         } catch {
@@ -228,19 +250,7 @@ private struct StationRow: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 7)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(isCurrent ? BlackMidiStyle.surfaceRaised.opacity(0.92) : Color.clear)
-            .overlay(alignment: .leading) {
-                if isCurrent {
-                    Rectangle()
-                        .fill(BlackMidiStyle.cyan)
-                        .frame(width: 2)
-                }
-            }
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(isCurrent ? BlackMidiStyle.cyan.opacity(0.6) : Color.clear, lineWidth: 1)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .selectionChrome(isSelected: isCurrent, accent: BlackMidiStyle.cyan)
             .opacity(station.enabled ? 1 : 0.5)
         }
         .buttonStyle(.plain)
@@ -281,9 +291,15 @@ private struct StationDraft: Identifiable {
         favorite = station.favorite
     }
 
+    var isURLValid: Bool {
+        let trimmed = url.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, let u = URL(string: trimmed), let scheme = u.scheme?.lowercased() else { return false }
+        return ["http", "https"].contains(scheme)
+    }
+
     var canSave: Bool {
-        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            && !url.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !trimmedName.isEmpty && isURLValid
     }
 
     func station() -> Station {
@@ -307,7 +323,7 @@ private struct StationEditSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Sender") {
+                Section {
                     TextField("Name", text: $draft.name)
                         .textInputAutocapitalization(.words)
 
@@ -317,6 +333,14 @@ private struct StationEditSheet: View {
                         .autocorrectionDisabled()
 
                     Toggle("Aktiv", isOn: $draft.enabled)
+                } header: {
+                    Text("Sender")
+                } footer: {
+                    if !draft.isURLValid && !draft.url.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        Text("Bitte eine gültige HTTP- oder HTTPS-URL eingeben.")
+                            .font(.caption)
+                            .foregroundStyle(BlackMidiStyle.red)
+                    }
                 }
 
                 if let onDelete {
@@ -359,9 +383,7 @@ private struct StationsJSONDocument: FileDocument {
     var data: Data
 
     init(stations: [Station]) {
-        let enc = JSONEncoder()
-        enc.outputFormatting = [.prettyPrinted, .sortedKeys]
-        data = (try? enc.encode(stations)) ?? Data("[]".utf8)
+        data = (try? StationStore.stationsEncoder.encode(stations)) ?? Data("[]".utf8)
     }
 
     init(configuration: ReadConfiguration) throws {

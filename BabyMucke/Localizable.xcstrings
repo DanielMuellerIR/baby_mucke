@@ -41,6 +41,16 @@
         }
       }
     },
+    "Bitte eine gültige HTTP- oder HTTPS-URL eingeben." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please enter a valid HTTP or HTTPS URL."
+          }
+        }
+      }
+    },
     "Älter als 1 Monat löschen" : {
       "localizations" : {
         "en" : {
@@ -154,6 +164,16 @@
         }
       }
     },
+    "Ersetzen" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replace"
+          }
+        }
+      }
+    },
     "Fehler: Audio-Session nicht verfügbar" : {
       "localizations" : {
         "en" : {
@@ -254,6 +274,16 @@
         }
       }
     },
+    "Möchtest du die Senderliste importieren? Die aktuelle Senderliste wird dabei ersetzt." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import station list? Your current stations will be replaced."
+          }
+        }
+      }
+    },
     "Name" : {
       "localizations" : {
         "en" : {
@@ -348,7 +378,14 @@
       }
     },
     "Sender deaktiviert" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Station disabled"
+          }
+        }
+      }
     },
     "Sender exportieren" : {
       "localizations" : {

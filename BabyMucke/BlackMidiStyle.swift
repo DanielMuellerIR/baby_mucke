@@ -22,9 +22,39 @@ enum BlackMidiStyle {
     static let red = adaptive(dark: "#FF5A6A", light: "#BA2737")
 
     private static func adaptive(dark: String, light: String) -> Color {
-        Color(uiColor: UIColor { traits in
-            UIColor(Color(hex: traits.userInterfaceStyle == .dark ? dark : light))
+        let darkUI = UIColor(Color(hex: dark))
+        let lightUI = UIColor(Color(hex: light))
+        return Color(uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark ? darkUI : lightUI
         })
+    }
+}
+
+struct SelectionChromeModifier: ViewModifier {
+    var isSelected: Bool
+    var accent: Color
+
+    func body(content: Content) -> some View {
+        content
+            .background(isSelected ? BlackMidiStyle.surfaceRaised.opacity(0.92) : Color.clear)
+            .overlay(alignment: .leading) {
+                if isSelected {
+                    Rectangle()
+                        .fill(accent)
+                        .frame(width: 2)
+                }
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(isSelected ? accent.opacity(0.6) : Color.clear, lineWidth: 1)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 6))
+    }
+}
+
+extension View {
+    func selectionChrome(isSelected: Bool, accent: Color) -> some View {
+        modifier(SelectionChromeModifier(isSelected: isSelected, accent: accent))
     }
 }
 

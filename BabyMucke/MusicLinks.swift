@@ -12,7 +12,11 @@ enum MusicLinks {
 
     static func appleMusicSearchURL(for entry: SongEntry) -> URL {
         var c = URLComponents(string: "https://music.apple.com/search")!
-        c.queryItems = [.init(name: "term", value: query(for: entry))]
+        let disallowed = CharacterSet(charactersIn: "+&=")
+        let allowed = CharacterSet.urlQueryAllowed.subtracting(disallowed)
+        let rawQuery = query(for: entry)
+        let encodedValue = rawQuery.addingPercentEncoding(withAllowedCharacters: allowed) ?? rawQuery
+        c.percentEncodedQueryItems = [.init(name: "term", value: encodedValue)]
         return c.url ?? URL(string: "https://music.apple.com/search")!
     }
 

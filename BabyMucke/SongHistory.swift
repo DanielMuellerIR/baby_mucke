@@ -1,15 +1,38 @@
 import Foundation
+import os
 
 // Ein gehoerter Titel: Sender, ICY-Rohtext, optional aufgeteilt in Interpret
 // und Titel, plus Start/Ende. `end == nil` bedeutet: Der Titel laeuft gerade.
 struct SongEntry: Identifiable, Codable, Equatable, Sendable {
-    var id = UUID()
+    var id: UUID
     var station: String
     var raw: String
     var artist: String?
     var title: String?
     var start: Date
     var end: Date?
+
+    init(id: UUID = UUID(), station: String, raw: String, artist: String? = nil, title: String? = nil, start: Date, end: Date? = nil) {
+        self.id = id
+        self.station = station
+        self.raw = raw
+        self.artist = artist
+        self.title = title
+        self.start = start
+        self.end = end
+    }
+
+    enum CodingKeys: String, CodingKey { case id, station, raw, artist, title, start, end }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = (try? c.decode(UUID.self, forKey: .id)) ?? UUID()
+        station = try c.decode(String.self, forKey: .station)
+        raw = try c.decode(String.self, forKey: .raw)
+        artist = try c.decodeIfPresent(String.self, forKey: .artist)
+        title = try c.decodeIfPresent(String.self, forKey: .title)
+        start = try c.decode(Date.self, forKey: .start)
+        end = try c.decodeIfPresent(Date.self, forKey: .end)
+    }
 
     static func split(_ s: String) -> (artist: String?, title: String?) {
         let t = s.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -33,6 +56,7 @@ final class SongHistory: ObservableObject {
     private let maxEntries = 2000
     private let shortImmediate: TimeInterval = 5
     private let shortLaunchQuit: TimeInterval = 20
+    private static let log = Logger(subsystem: "de.babymucke.BabyMucke", category: "SongHistory")
 
     // ISO-8601-Coder fuer die verlauf.json. Nur hier genutzt, deshalb als private
     // statische Helfer statt globaler JSONDecoder/JSONEncoder-Extensions.
@@ -84,7 +108,7 @@ final class SongHistory: ObservableObject {
         if changed { save() }
     }
 
-    func pruneOnLaunchOrQuit() {
+    func pruneOnLaunch() {
         if removeShort(shortLaunchQuit) { save() }
     }
 
@@ -134,11 +158,15 @@ final class SongHistory: ObservableObject {
         // aber konsistent (geschlossen) und macht ihn regulaer prune-bar, statt
         // ihn dauerhaft als "laeuft noch" zu fuehren.
         closeCurrent()
-        pruneOnLaunchOrQuit()
+        pruneOnLaunch()
     }
 
     private func save() {
-        guard let data = try? Self.isoEncoder.encode(entries) else { return }
-        try? data.write(to: fileURL, options: .atomic)
+        do {
+            let data = try Self.isoEncoder.encode(entries)
+            try data.write(to: fileURL, options: .atomic)
+        } catch {
+            Self.log.error("verlauf.json konnte nicht gespeichert werden: \(error)")
+        }
     }
 }

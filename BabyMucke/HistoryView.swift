@@ -114,29 +114,30 @@ struct HistoryView: View {
     }
 
     private var actionBar: some View {
-        HStack(spacing: 6) {
+        let selected = selectedEntry
+        return HStack(spacing: 6) {
             Button {
-                if let selectedEntry {
-                    openURL(MusicLinks.appleMusicSearchURL(for: selectedEntry))
+                if let selected {
+                    openURL(MusicLinks.appleMusicSearchURL(for: selected))
                 }
             } label: {
                 Label("\u{F8FF} Music", systemImage: "magnifyingglass")
                     .labelStyle(.titleAndIcon)
             }
             .buttonStyle(HistoryActionButtonStyle(tint: BlackMidiStyle.text))
-            .disabled(selectedEntry == nil)
+            .disabled(selected == nil)
             .help("Apple Music")
 
             Button {
-                if let selectedEntry {
-                    openURL(MusicLinks.spotifySearchURL(for: selectedEntry))
+                if let selected {
+                    openURL(MusicLinks.spotifySearchURL(for: selected))
                 }
             } label: {
                 Label("Spotify", systemImage: "magnifyingglass")
                     .labelStyle(.titleAndIcon)
             }
             .buttonStyle(HistoryActionButtonStyle(tint: BlackMidiStyle.text))
-            .disabled(selectedEntry == nil)
+            .disabled(selected == nil)
             .help("Spotify")
 
             Button(role: .destructive) {
@@ -146,7 +147,7 @@ struct HistoryView: View {
                     .labelStyle(.titleAndIcon)
             }
             .buttonStyle(HistoryActionButtonStyle(tint: BlackMidiStyle.text))
-            .disabled(selectedEntry == nil)
+            .disabled(selected == nil)
             .help("Eintrag löschen")
         }
         .padding(.horizontal, 8)
@@ -237,19 +238,7 @@ private struct HistoryRow: View {
             .padding(.horizontal, 8)
             .padding(.vertical, 7)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(isSelected ? BlackMidiStyle.surfaceRaised.opacity(0.92) : Color.clear)
-            .overlay(alignment: .leading) {
-                if isSelected {
-                    Rectangle()
-                        .fill(BlackMidiStyle.pink)
-                        .frame(width: 2)
-                }
-            }
-            .overlay {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(isSelected ? BlackMidiStyle.pink.opacity(0.55) : Color.clear, lineWidth: 1)
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 6))
+            .selectionChrome(isSelected: isSelected, accent: BlackMidiStyle.pink)
         }
         .buttonStyle(.plain)
     }

@@ -4,11 +4,11 @@ import Foundation
 // `id` bleibt stabil, damit Favorit, Verlauf und zuletzt gespielter Sender auch
 // nach Umbenennen oder Umsortieren zuverlaessig zusammenfinden.
 struct Station: Identifiable, Codable, Equatable, Hashable {
-    var id: UUID = UUID()
+    var id: UUID
     var name: String
     var url: String
-    var enabled: Bool = true
-    var favorite: Bool = false
+    var enabled: Bool
+    var favorite: Bool
 
     init(id: UUID = UUID(), name: String, url: String, enabled: Bool = true, favorite: Bool = false) {
         self.id = id
@@ -36,8 +36,8 @@ struct Station: Identifiable, Codable, Equatable, Hashable {
 struct SeedStation: Decodable {
     let name: String
     let url: String
-    var enabled: Bool = true
-    var favorite: Bool = false
+    var enabled: Bool
+    var favorite: Bool
 
     enum CodingKeys: String, CodingKey { case name, url, enabled, favorite }
     init(from decoder: Decoder) throws {
